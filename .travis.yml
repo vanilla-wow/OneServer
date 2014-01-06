@@ -26,6 +26,7 @@ git:
 branches:
   only:
     - master
+    - playerbot
 
 compiler:
   - gcc
