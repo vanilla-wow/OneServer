@@ -101,5 +101,5 @@ To be able to accomplish these goals, we support and promote:
   so, delete this exception statement from your version.
 
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/eluna-dev-mangos/elunacoretbc/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/CoronaCore/Server/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
