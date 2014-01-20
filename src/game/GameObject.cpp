@@ -1416,10 +1416,17 @@ void GameObject::Use(Unit* user)
                     spellCaster = firstUser;
 
             spellId = info->summoningRitual.spellId;
-
-            // spell have reagent and mana cost but it not expected use its
-            // it triggered spell in fact casted at currently channeled GO
-            triggered = true;
+            switch (spellId)
+            {
+                case 34145:
+                {
+                    spellId = 29886;
+                    triggered = true;
+                    break;
+                }
+                default:
+                    break;
+            }
 
             // finish owners spell
             if (owner)
