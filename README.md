@@ -66,6 +66,12 @@ To be able to accomplish these goals, we support and promote:
   * [Eluna Wiki](http://wiki.emudevs.com/doku.php?id=eluna)
   * [Eluna Support Forum](http://emudevs.com)
 
+#
+
+  You can find further information about PlayerBot at the following places:
+  * [PlayerBot Forum](http://playerbot.mine.nu/)
+  * [PlayerBot GitHub](https://github.com/blueboy)
+
 ## License
 
   CMaNGOS is free software; you can redistribute it and/or modify
