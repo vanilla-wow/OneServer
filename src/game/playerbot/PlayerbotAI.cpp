@@ -17,6 +17,7 @@
  */
 
 #include "Common.h"
+#include "Chat.h"
 #include "Database/DatabaseEnv.h"
 #include "../ItemPrototype.h"
 #include "../World.h"
@@ -4786,8 +4787,8 @@ void PlayerbotAI::TellMaster(const char* fmt, ...) const
 
 void PlayerbotAI::SendWhisper(const std::string& text, Player& player) const
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
-    m_bot->BuildPlayerChat(&data, CHAT_MSG_WHISPER, text, LANG_UNIVERSAL);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, text.c_str(), LANG_UNIVERSAL, m_bot->GetChatTag(), m_bot->GetObjectGuid(), m_bot->GetName());
     player.GetSession()->SendPacket(&data);
 }
 
