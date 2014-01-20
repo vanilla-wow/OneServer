@@ -59,7 +59,7 @@ PlayerbotDruidAI::PlayerbotDruidAI(Player* const master, Player* const bot, Play
     RAKE                          = ai->initSpell(RAKE_1);
     CLAW                          = ai->initSpell(CLAW_1); // 45
     COWER                         = ai->initSpell(COWER_1); // 20
-    MANGLE                        = ai->initSpell(MANGLE_1); // 45
+    MANGLE                        = ai->initSpell(MANGLE_1);// 45
     TIGERS_FURY                   = ai->initSpell(TIGERS_FURY_1);
     // Cat Finishing Move's
     RIP                           = ai->initSpell(RIP_1); // 30
@@ -83,34 +83,34 @@ PlayerbotDruidAI::PlayerbotDruidAI(Player* const master, Player* const bot, Play
 
 PlayerbotDruidAI::~PlayerbotDruidAI() {}
 
-bool PlayerbotDruidAI::HealTarget(Unit *target)
+bool PlayerbotDruidAI::HealTarget(Unit* target)
 {
     PlayerbotAI* ai = GetAI();
     uint8 hp = target->GetHealth() * 100 / target->GetMaxHealth();
 
-    //If spell exists and orders say we should be dispelling
+    // If spell exists and orders say we should be dispelling
     if ((REMOVE_CURSE > 0 || ABOLISH_POISON > 0) && ai->GetCombatOrder() != PlayerbotAI::ORDERS_NODISPEL)
     {
-        //This does something important(lol)
+        // This does something important(lol)
         uint32 dispelMask  = GetDispellMask(DISPEL_CURSE);
         uint32 dispelMask2  = GetDispellMask(DISPEL_POISON);
-        //Get a list of all the targets auras(spells affecting target)
+        // Get a list of all the targets auras(spells affecting target)
         Unit::SpellAuraHolderMap const& auras = target->GetSpellAuraHolderMap();
-        //Iterate through the auras
-        for(Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+        // Iterate through the auras
+        for (Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
         {
-            SpellAuraHolder *holder = itr->second;
-            //I dont know what this does but it doesn't work without it
-            if ((1<<holder->GetSpellProto()->Dispel) & dispelMask)
+            SpellAuraHolder* holder = itr->second;
+            // I dont know what this does but it doesn't work without it
+            if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
             {
-                //If the spell is dispellable and we can dispel it, do so
-                if((holder->GetSpellProto()->Dispel == DISPEL_CURSE) & (REMOVE_CURSE > 0))
+                // If the spell is dispellable and we can dispel it, do so
+                if ((holder->GetSpellProto()->Dispel == DISPEL_CURSE) & (REMOVE_CURSE > 0))
                     ai->CastSpell(REMOVE_CURSE, *target);
                 return false;
             }
-            else if ((1<<holder->GetSpellProto()->Dispel) & dispelMask2)
+            else if ((1 << holder->GetSpellProto()->Dispel) & dispelMask2)
             {
-                if((holder->GetSpellProto()->Dispel == DISPEL_POISON) & (ABOLISH_POISON > 0))
+                if ((holder->GetSpellProto()->Dispel == DISPEL_POISON) & (ABOLISH_POISON > 0))
                     ai->CastSpell(ABOLISH_POISON, *target);
                 return false;
             }
@@ -123,31 +123,31 @@ bool PlayerbotDruidAI::HealTarget(Unit *target)
     // Reset form if needed
     GoBuffForm(GetPlayerBot());
 
-    if (hp < 70 && REJUVENATION > 0 && ai->In_Reach(target,REJUVENATION) && !target->HasAura(REJUVENATION) && ai->CastSpell(REJUVENATION, *target))
+    if (hp < 70 && REJUVENATION > 0 && ai->In_Reach(target, REJUVENATION) && !target->HasAura(REJUVENATION) && ai->CastSpell(REJUVENATION, *target))
         return true;
 
-    if (hp < 60 && LIFEBLOOM > 0 && ai->In_Reach(target,LIFEBLOOM) && !target->HasAura(LIFEBLOOM) && ai->CastSpell(LIFEBLOOM, *target))
+    if (hp < 60 && LIFEBLOOM > 0 && ai->In_Reach(target, LIFEBLOOM) && !target->HasAura(LIFEBLOOM) && ai->CastSpell(LIFEBLOOM, *target))
         return true;
 
-    if (hp < 55 && REGROWTH > 0 && ai->In_Reach(target,REGROWTH) && !target->HasAura(REGROWTH) && ai->CastSpell(REGROWTH, *target))
+    if (hp < 55 && REGROWTH > 0 && ai->In_Reach(target, REGROWTH) && !target->HasAura(REGROWTH) && ai->CastSpell(REGROWTH, *target))
         return true;
 
-    if (hp < 50 && SWIFTMEND > 0  && ai->In_Reach(target,SWIFTMEND) && (target->HasAura(REJUVENATION) || target->HasAura(REGROWTH)) && ai->CastSpell(SWIFTMEND, *target))
+    if (hp < 50 && SWIFTMEND > 0  && ai->In_Reach(target, SWIFTMEND) && (target->HasAura(REJUVENATION) || target->HasAura(REGROWTH)) && ai->CastSpell(SWIFTMEND, *target))
         return true;
 
-    if (hp < 45 && WILD_GROWTH > 0 && ai->In_Reach(target,WILD_GROWTH) && !target->HasAura(WILD_GROWTH) && ai->CastSpell(WILD_GROWTH, *target))
+    if (hp < 45 && WILD_GROWTH > 0 && ai->In_Reach(target, WILD_GROWTH) && !target->HasAura(WILD_GROWTH) && ai->CastSpell(WILD_GROWTH, *target))
         return true;
 
-    if (hp < 30 && NOURISH > 0 && ai->In_Reach(target,NOURISH) && ai->CastSpell(NOURISH, *target))
+    if (hp < 30 && NOURISH > 0 && ai->In_Reach(target, NOURISH) && ai->CastSpell(NOURISH, *target))
         return true;
 
-    if (hp < 25 && HEALING_TOUCH > 0 && ai->In_Reach(target,HEALING_TOUCH) && ai->CastSpell(HEALING_TOUCH, *target))
+    if (hp < 25 && HEALING_TOUCH > 0 && ai->In_Reach(target, HEALING_TOUCH) && ai->CastSpell(HEALING_TOUCH, *target))
         return true;
 
     return false;
 } // end HealTarget
 
-void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
+void PlayerbotDruidAI::DoNextCombatManeuver(Unit* pTarget)
 {
     PlayerbotAI* ai = GetAI();
     if (!ai)
@@ -164,7 +164,7 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
 
     uint32 masterHP = GetMaster()->GetHealth() * 100 / GetMaster()->GetMaxHealth();
 
-    Player *m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
     Unit* pVictim = pTarget->getVictim();
 
     if (ai->IsTank())
@@ -179,7 +179,7 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
     switch (SpellSequence)
     {
         case DruidTank: // Its now a tank druid!
-            //ai->TellMaster("DruidTank");
+            // ai->TellMaster("DruidTank");
 
             if (!m_bot->HasInArc(M_PI_F, pTarget))
             {
@@ -188,22 +188,22 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
             }
             if (m_bot->HasAura(CAT_FORM, EFFECT_INDEX_0))
                 m_bot->RemoveAurasDueToSpell(768);
-            //ai->TellMaster("FormClearCat");
+            // ai->TellMaster("FormClearCat");
             if (MOONKIN_FORM > 0 && !m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0))
-                ai->CastSpell (MOONKIN_FORM);
+                ai->CastSpell(MOONKIN_FORM);
             else if (DIRE_BEAR_FORM > 0 && !m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && !m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0))
-                ai->CastSpell (DIRE_BEAR_FORM);
+                ai->CastSpell(DIRE_BEAR_FORM);
             else if (BEAR_FORM > 0 && !m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && !m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0) && !m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0))
-                ai->CastSpell (BEAR_FORM);
+                ai->CastSpell(BEAR_FORM);
             else if (DEMORALIZING_ROAR > 0 && (m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0) || m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0)) && !m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && !pTarget->HasAura(DEMORALIZING_ROAR, EFFECT_INDEX_0) && ai->GetRageAmount() >= 10)
                 ai->CastSpell(DEMORALIZING_ROAR, *pTarget);
-            if (FAERIE_FIRE > 0 && ai->In_Reach(pTarget,FAERIE_FIRE) && DruidSpellCombat < 1 && !pTarget->HasAura(FAERIE_FIRE, EFFECT_INDEX_0))
+            if (FAERIE_FIRE > 0 && ai->In_Reach(pTarget, FAERIE_FIRE) && DruidSpellCombat < 1 && !pTarget->HasAura(FAERIE_FIRE, EFFECT_INDEX_0))
             {
                 ai->CastSpell(FAERIE_FIRE, *pTarget);
                 DruidSpellCombat++;
                 break;
             }
-            else if (MOONFIRE > 0 && ai->In_Reach(pTarget,MOONFIRE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 2 && !pTarget->HasAura(MOONFIRE, EFFECT_INDEX_0) && ai->GetManaPercent() >= 24)
+            else if (MOONFIRE > 0 && ai->In_Reach(pTarget, MOONFIRE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 2 && !pTarget->HasAura(MOONFIRE, EFFECT_INDEX_0) && ai->GetManaPercent() >= 24)
             {
                 ai->CastSpell(MOONFIRE, *pTarget);
                 DruidSpellCombat++;
@@ -215,40 +215,40 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
                 DruidSpellCombat++;
                 break;
             }
-            else if (HURRICANE > 0 && ai->In_Reach(pTarget,HURRICANE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && ai->GetAttackerCount() >= 5 && DruidSpellCombat < 4 && ai->GetManaPercent() >= 91)
+            else if (HURRICANE > 0 && ai->In_Reach(pTarget, HURRICANE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && ai->GetAttackerCount() >= 5 && DruidSpellCombat < 4 && ai->GetManaPercent() >= 91)
             {
-                //ai->TellMaster("casting hurricane!");
+                // ai->TellMaster("casting hurricane!");
                 ai->CastSpell(HURRICANE, *pTarget);
                 ai->SetIgnoreUpdateTime(10);
                 DruidSpellCombat++;
                 break;
             }
-            else if (WRATH > 0 && ai->In_Reach(pTarget,WRATH) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 5 && ai->GetManaPercent() >= 13)
+            else if (WRATH > 0 && ai->In_Reach(pTarget, WRATH) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 5 && ai->GetManaPercent() >= 13)
             {
                 ai->CastSpell(WRATH, *pTarget);
                 DruidSpellCombat++;
                 break;
             }
-            else if (INSECT_SWARM > 0 && ai->In_Reach(pTarget,INSECT_SWARM) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 6 && !pTarget->HasAura(INSECT_SWARM, EFFECT_INDEX_0) && ai->GetManaPercent() >= 9)
+            else if (INSECT_SWARM > 0 && ai->In_Reach(pTarget, INSECT_SWARM) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 6 && !pTarget->HasAura(INSECT_SWARM, EFFECT_INDEX_0) && ai->GetManaPercent() >= 9)
             {
                 ai->CastSpell(INSECT_SWARM, *pTarget);
                 DruidSpellCombat++;
                 break;
             }
-            else if (STARFIRE > 0 && ai->In_Reach(pTarget,STARFIRE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 7 && ai->GetManaPercent() >= 18)
+            else if (STARFIRE > 0 && ai->In_Reach(pTarget, STARFIRE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 7 && ai->GetManaPercent() >= 18)
             {
                 ai->CastSpell(STARFIRE, *pTarget);
                 DruidSpellCombat++;
                 break;
             }
-            else if (FORCE_OF_NATURE > 0 && ai->In_Reach(pTarget,FORCE_OF_NATURE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 8 && ai->GetManaPercent() >= 12)
+            else if (FORCE_OF_NATURE > 0 && ai->In_Reach(pTarget, FORCE_OF_NATURE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && DruidSpellCombat < 8 && ai->GetManaPercent() >= 12)
             {
-                //ai->TellMaster("summoning treants.");
+                // ai->TellMaster("summoning treants.");
                 ai->CastSpell(FORCE_OF_NATURE);
                 DruidSpellCombat++;
                 break;
             }
-            else if (STARFALL > 0 && ai->In_Reach(pTarget,STARFALL) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && !m_bot->HasAura(STARFALL, EFFECT_INDEX_0) && ai->GetAttackerCount() >= 3 && DruidSpellCombat < 9 && ai->GetManaPercent() >= 39)
+            else if (STARFALL > 0 && ai->In_Reach(pTarget, STARFALL) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && !m_bot->HasAura(STARFALL, EFFECT_INDEX_0) && ai->GetAttackerCount() >= 3 && DruidSpellCombat < 9 && ai->GetManaPercent() >= 39)
             {
                 ai->CastSpell(STARFALL, *pTarget);
                 DruidSpellCombat++;
@@ -260,7 +260,7 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
                 DruidSpellCombat++;
                 break;
             }
-            else if (INNERVATE > 0 && ai->In_Reach(pTarget,INNERVATE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && ai->GetManaPercent() < 50 && DruidSpellCombat < 11 && !m_bot->HasAura(INNERVATE, EFFECT_INDEX_0))
+            else if (INNERVATE > 0 && ai->In_Reach(pTarget, INNERVATE) && m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0) && ai->GetManaPercent() < 50 && DruidSpellCombat < 11 && !m_bot->HasAura(INNERVATE, EFFECT_INDEX_0))
             {
                 ai->CastSpell(INNERVATE, *m_bot);
                 DruidSpellCombat++;
@@ -272,7 +272,7 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
                 DruidSpellCombat = DruidSpellCombat + 2;
                 break;
             }
-            else if (SWIPE > 0 && ai->In_Reach(pTarget,SWIPE) && (m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0) || m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0)) && DruidSpellCombat < 4 && ai->GetRageAmount() >= 20)
+            else if (SWIPE > 0 && ai->In_Reach(pTarget, SWIPE) && (m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0) || m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0)) && DruidSpellCombat < 4 && ai->GetRageAmount() >= 20)
             {
                 ai->CastSpell(SWIPE, *pTarget);
                 DruidSpellCombat = DruidSpellCombat + 2;
@@ -296,7 +296,7 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
                 DruidSpellCombat = DruidSpellCombat + 2;
                 break;
             }
-            else if (GROWL > 0 && ai->In_Reach(pTarget,GROWL) && (m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0) || m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0)) && pVictim != m_bot && DruidSpellCombat < 12 && !pTarget->HasAura(CHALLENGING_ROAR, EFFECT_INDEX_0) && !pTarget->HasAura(GROWL, EFFECT_INDEX_0))
+            else if (GROWL > 0 && ai->In_Reach(pTarget, GROWL) && (m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0) || m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0)) && pVictim != m_bot && DruidSpellCombat < 12 && !pTarget->HasAura(CHALLENGING_ROAR, EFFECT_INDEX_0) && !pTarget->HasAura(GROWL, EFFECT_INDEX_0))
             {
                 ai->CastSpell(GROWL, *pTarget);
                 DruidSpellCombat = DruidSpellCombat + 2;
@@ -315,38 +315,38 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
             break;
 
         case DruidSpell:
-            //ai->TellMaster("DruidSpell");
+            // ai->TellMaster("DruidSpell");
             if (m_bot->HasAura(CAT_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(768);
-                //ai->TellMaster("FormClearCat");
+                // ai->TellMaster("FormClearCat");
                 break;
             }
             if (m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(5487);
-                //ai->TellMaster("FormClearBear");
+                // ai->TellMaster("FormClearBear");
                 break;
             }
             if (m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(9634);
-                //ai->TellMaster("FormClearDireBear");
+                // ai->TellMaster("FormClearDireBear");
                 break;
             }
             if (m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(24858);
-                //ai->TellMaster("FormClearMoonkin");
+                // ai->TellMaster("FormClearMoonkin");
                 break;
             }
-            if (FAERIE_FIRE > 0 && ai->In_Reach(pTarget,FAERIE_FIRE) && DruidSpellCombat < 1 && !pTarget->HasAura(FAERIE_FIRE, EFFECT_INDEX_0) && ai->GetManaPercent() >= 8)
+            if (FAERIE_FIRE > 0 && ai->In_Reach(pTarget, FAERIE_FIRE) && DruidSpellCombat < 1 && !pTarget->HasAura(FAERIE_FIRE, EFFECT_INDEX_0) && ai->GetManaPercent() >= 8)
             {
                 ai->CastSpell(FAERIE_FIRE, *pTarget);
                 DruidSpellCombat++;
                 break;
             }
-            else if (MOONFIRE > 0 && ai->In_Reach(pTarget,MOONFIRE) && DruidSpellCombat < 2 && !pTarget->HasAura(MOONFIRE, EFFECT_INDEX_0) && ai->GetManaPercent() >= 24)
+            else if (MOONFIRE > 0 && ai->In_Reach(pTarget, MOONFIRE) && DruidSpellCombat < 2 && !pTarget->HasAura(MOONFIRE, EFFECT_INDEX_0) && ai->GetManaPercent() >= 24)
             {
                 ai->CastSpell(MOONFIRE, *pTarget);
                 DruidSpellCombat++;
@@ -358,40 +358,40 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
                 DruidSpellCombat++;
                 break;
             }
-            else if (HURRICANE > 0 && ai->In_Reach(pTarget,HURRICANE) && ai->GetAttackerCount() >= 5 && DruidSpellCombat < 4 && ai->GetManaPercent() >= 91)
+            else if (HURRICANE > 0 && ai->In_Reach(pTarget, HURRICANE) && ai->GetAttackerCount() >= 5 && DruidSpellCombat < 4 && ai->GetManaPercent() >= 91)
             {
-                //ai->TellMaster("casting hurricane!");
+                // ai->TellMaster("casting hurricane!");
                 ai->CastSpell(HURRICANE, *pTarget);
                 ai->SetIgnoreUpdateTime(10);
                 DruidSpellCombat++;
                 break;
             }
-            else if (WRATH > 0 && ai->In_Reach(pTarget,WRATH) && DruidSpellCombat < 5 && ai->GetManaPercent() >= 13)
+            else if (WRATH > 0 && ai->In_Reach(pTarget, WRATH) && DruidSpellCombat < 5 && ai->GetManaPercent() >= 13)
             {
                 ai->CastSpell(WRATH, *pTarget);
                 DruidSpellCombat++;
                 break;
             }
-            else if (INSECT_SWARM > 0 && ai->In_Reach(pTarget,INSECT_SWARM) && DruidSpellCombat < 6 && !pTarget->HasAura(INSECT_SWARM, EFFECT_INDEX_0) && ai->GetManaPercent() >= 9)
+            else if (INSECT_SWARM > 0 && ai->In_Reach(pTarget, INSECT_SWARM) && DruidSpellCombat < 6 && !pTarget->HasAura(INSECT_SWARM, EFFECT_INDEX_0) && ai->GetManaPercent() >= 9)
             {
                 ai->CastSpell(INSECT_SWARM, *pTarget);
                 DruidSpellCombat++;
                 break;
             }
-            else if (STARFIRE > 0 && ai->In_Reach(pTarget,STARFIRE) && DruidSpellCombat < 7 && ai->GetManaPercent() >= 18)
+            else if (STARFIRE > 0 && ai->In_Reach(pTarget, STARFIRE) && DruidSpellCombat < 7 && ai->GetManaPercent() >= 18)
             {
                 ai->CastSpell(STARFIRE, *pTarget);
                 DruidSpellCombat++;
                 break;
             }
-            else if (FORCE_OF_NATURE > 0 && ai->In_Reach(pTarget,FORCE_OF_NATURE) && DruidSpellCombat < 8 && ai->GetManaPercent() >= 12)
+            else if (FORCE_OF_NATURE > 0 && ai->In_Reach(pTarget, FORCE_OF_NATURE) && DruidSpellCombat < 8 && ai->GetManaPercent() >= 12)
             {
-                //ai->TellMaster("summoning treants.");
+                // ai->TellMaster("summoning treants.");
                 ai->CastSpell(FORCE_OF_NATURE);
                 DruidSpellCombat++;
                 break;
             }
-            else if (STARFALL > 0 && ai->In_Reach(pTarget,STARFALL) && !m_bot->HasAura(STARFALL, EFFECT_INDEX_0) && ai->GetAttackerCount() >= 3 && DruidSpellCombat < 9 && ai->GetManaPercent() >= 39)
+            else if (STARFALL > 0 && ai->In_Reach(pTarget, STARFALL) && !m_bot->HasAura(STARFALL, EFFECT_INDEX_0) && ai->GetAttackerCount() >= 3 && DruidSpellCombat < 9 && ai->GetManaPercent() >= 39)
             {
                 ai->CastSpell(STARFALL, *pTarget);
                 DruidSpellCombat++;
@@ -403,7 +403,7 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
                 DruidSpellCombat++;
                 break;
             }
-            else if (INNERVATE > 0 && ai->In_Reach(pTarget,INNERVATE) && ai->GetManaPercent() < 50 && DruidSpellCombat < 11 && !m_bot->HasAura(INNERVATE, EFFECT_INDEX_0))
+            else if (INNERVATE > 0 && ai->In_Reach(pTarget, INNERVATE) && ai->GetManaPercent() < 50 && DruidSpellCombat < 11 && !m_bot->HasAura(INNERVATE, EFFECT_INDEX_0))
             {
                 ai->CastSpell(INNERVATE, *m_bot);
                 DruidSpellCombat++;
@@ -422,39 +422,39 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
             break;
 
         case DruidHeal:
-            //ai->TellMaster("DruidHeal");
+            // ai->TellMaster("DruidHeal");
             if (m_bot->HasAura(CAT_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(768);
-                //ai->TellMaster("FormClearCat");
+                // ai->TellMaster("FormClearCat");
                 break;
             }
             if (m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(5487);
-                //ai->TellMaster("FormClearBear");
+                // ai->TellMaster("FormClearBear");
                 break;
             }
             if (m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(9634);
-                //ai->TellMaster("FormClearDireBear");
+                // ai->TellMaster("FormClearDireBear");
                 break;
             }
             if (m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(24858);
-                //ai->TellMaster("FormClearMoonkin");
+                // ai->TellMaster("FormClearMoonkin");
                 break;
             }
             if (ai->GetHealthPercent() <= 40)
             {
-                HealTarget (m_bot);
+                HealTarget(m_bot);
                 break;
             }
             if (masterHP <= 40)
             {
-                HealTarget (GetMaster());
+                HealTarget(GetMaster());
                 break;
             }
             else
@@ -465,7 +465,7 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
             break;
 
         case DruidCombat:
-            //ai->TellMaster("DruidCombat");
+            // ai->TellMaster("DruidCombat");
             if (!m_bot->HasInArc(M_PI_F, pTarget))
             {
                 if (pVictim)
@@ -474,52 +474,52 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
             if (m_bot->HasAura(BEAR_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(5487);
-                //ai->TellMaster("FormClearBear");
+                // ai->TellMaster("FormClearBear");
                 break;
             }
             if (m_bot->HasAura(DIRE_BEAR_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(9634);
-                //ai->TellMaster("FormClearDireBear");
+                // ai->TellMaster("FormClearDireBear");
                 break;
             }
             if (m_bot->HasAura(MOONKIN_FORM, EFFECT_INDEX_0))
             {
                 m_bot->RemoveAurasDueToSpell(24858);
-                //ai->TellMaster("FormClearMoonkin");
+                // ai->TellMaster("FormClearMoonkin");
                 break;
             }
             if (CAT_FORM > 0 && !m_bot->HasAura(CAT_FORM, EFFECT_INDEX_0))
-                ai->CastSpell (CAT_FORM);
+                ai->CastSpell(CAT_FORM);
             if (MAIM > 0 && m_bot->GetComboPoints() >= 1 && pTarget->IsNonMeleeSpellCasted(true))
             {
                 ai->CastSpell(MAIM, *pTarget);
-                //ai->TellMaster("SpellPreventing Maim");
+                // ai->TellMaster("SpellPreventing Maim");
                 break;
             }
 
             if (RAKE > 0 && m_bot->GetComboPoints() <= 1 && ai->GetEnergyAmount() >= 40)
             {
-                ai->CastSpell (RAKE, *pTarget);
-                //ai->TellMaster("Rake");
+                ai->CastSpell(RAKE, *pTarget);
+                // ai->TellMaster("Rake");
                 break;
             }
             else if (CLAW > 0 && m_bot->GetComboPoints() <= 2 && ai->GetEnergyAmount() >= 45)
             {
-                ai->CastSpell (CLAW, *pTarget);
-                //ai->TellMaster("Claw");
+                ai->CastSpell(CLAW, *pTarget);
+                // ai->TellMaster("Claw");
                 break;
             }
             else if (MANGLE > 0 && m_bot->GetComboPoints() <= 3 && ai->GetEnergyAmount() >= 45)
             {
-                ai->CastSpell (MANGLE, *pTarget);
-                //ai->TellMaster("Mangle");
+                ai->CastSpell(MANGLE, *pTarget);
+                // ai->TellMaster("Mangle");
                 break;
             }
             else if (CLAW > 0 && m_bot->GetComboPoints() <= 4 && ai->GetEnergyAmount() >= 45)
             {
-                ai->CastSpell (CLAW, *pTarget);
-                //ai->TellMaster("Claw2");
+                ai->CastSpell(CLAW, *pTarget);
+                // ai->TellMaster("Claw2");
                 break;
             }
 
@@ -527,34 +527,34 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
             {
                 if (RIP > 0 && pTarget->getClass() == CLASS_ROGUE && ai->GetEnergyAmount() >= 30)
                     ai->CastSpell(RIP, *pTarget);
-                //ai->TellMaster("Rogue Rip");
+                // ai->TellMaster("Rogue Rip");
                 else if (MAIM > 0 && pTarget->getClass() == CLASS_DRUID && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(MAIM, *pTarget);
-                //ai->TellMaster("Druid Maim");
+                // ai->TellMaster("Druid Maim");
                 else if (MAIM > 0 && pTarget->getClass() == CLASS_SHAMAN && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(MAIM, *pTarget);
-                //ai->TellMaster("Shaman Maim");
+                // ai->TellMaster("Shaman Maim");
                 else if (MAIM > 0 && pTarget->getClass() == CLASS_WARLOCK && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(MAIM, *pTarget);
-                //ai->TellMaster("Warlock Maim");
+                // ai->TellMaster("Warlock Maim");
                 else if (FEROCIOUS_BITE > 0 && pTarget->getClass() == CLASS_HUNTER && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(FEROCIOUS_BITE, *pTarget);
-                //ai->TellMaster("Hunter Ferocious Bite");
+                // ai->TellMaster("Hunter Ferocious Bite");
                 else if (FEROCIOUS_BITE > 0 && pTarget->getClass() == CLASS_WARRIOR && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(FEROCIOUS_BITE, *pTarget);
-                //ai->TellMaster("Warrior Ferocious Bite");
+                // ai->TellMaster("Warrior Ferocious Bite");
                 else if (FEROCIOUS_BITE > 0 && pTarget->getClass() == CLASS_PALADIN && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(FEROCIOUS_BITE, *pTarget);
-                //ai->TellMaster("Paladin Ferocious Bite");
+                // ai->TellMaster("Paladin Ferocious Bite");
                 else if (MAIM > 0 && pTarget->getClass() == CLASS_MAGE && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(MAIM, *pTarget);
-                //ai->TellMaster("Mage Maim");
+                // ai->TellMaster("Mage Maim");
                 else if (MAIM > 0 && pTarget->getClass() == CLASS_PRIEST && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(MAIM, *pTarget);
-                //ai->TellMaster("Priest Maim");
+                // ai->TellMaster("Priest Maim");
                 else if (MAIM > 0 && ai->GetEnergyAmount() >= 35)
                     ai->CastSpell(MAIM, *pTarget);
-                //ai->TellMaster("Else Maim");
+                // ai->TellMaster("Else Maim");
                 break;
             }
             else
@@ -568,8 +568,8 @@ void PlayerbotDruidAI::DoNextCombatManeuver(Unit *pTarget)
 
 void PlayerbotDruidAI::DoNonCombatActions()
 {
-    Player * m_bot = GetPlayerBot();
-    Player * master = GetMaster();
+    Player* m_bot = GetPlayerBot();
+    Player* master = GetMaster();
     if (!m_bot || !master)
         return;
 
@@ -620,7 +620,7 @@ void PlayerbotDruidAI::DoNonCombatActions()
         Group::MemberSlotList const& groupSlot = GetMaster()->GetGroup()->GetMemberSlots();
         for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
         {
-            Player *tPlayer = sObjectMgr.GetPlayer(itr->guid);
+            Player* tPlayer = sObjectMgr.GetPlayer(itr->guid);
             if (!tPlayer || tPlayer == m_bot)
                 continue;
 
@@ -657,8 +657,7 @@ void PlayerbotDruidAI::DoNonCombatActions()
             if (HealTarget(master))
                 return;
         }
-        else
-        if (ai->CastSpell(REVIVE, *master))
+        else if (ai->CastSpell(REVIVE, *master))
             ai->TellMaster("Resurrecting you, Master.");
     }
 
@@ -667,9 +666,9 @@ void PlayerbotDruidAI::DoNonCombatActions()
 
 bool PlayerbotDruidAI::BuffPlayer(Player* target)
 {
-    PlayerbotAI * ai = GetAI();
+    PlayerbotAI* ai = GetAI();
 
-    Pet * pet = target->GetPet();
+    Pet* pet = target->GetPet();
     if (pet)
     {
         if (ai->Buff(MARK_OF_THE_WILD, pet, &(PlayerbotDruidAI::GoBuffForm)))
@@ -686,7 +685,7 @@ bool PlayerbotDruidAI::BuffPlayer(Player* target)
         return false;
 }
 
-void PlayerbotDruidAI::GoBuffForm(Player *self)
+void PlayerbotDruidAI::GoBuffForm(Player* self)
 {
     // RANK_1 spell ids used because this is a static method which does not have access to instance.
     // There is only one rank for these spells anyway.

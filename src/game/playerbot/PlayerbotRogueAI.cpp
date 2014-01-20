@@ -58,7 +58,7 @@ PlayerbotRogueAI::PlayerbotRogueAI(Player* const master, Player* const bot, Play
     RECENTLY_BANDAGED   = 11196; // first aid check
     // racial
     ARCANE_TORRENT           = ai->initSpell(ARCANE_TORRENT_ROGUE);
-    STONEFORM                = ai->initSpell(STONEFORM_ALL); // dwarf
+    STONEFORM                = ai->initSpell(STONEFORM_ALL);// dwarf
     ESCAPE_ARTIST            = ai->initSpell(ESCAPE_ARTIST_ALL); // gnome
     EVERY_MAN_FOR_HIMSELF    = ai->initSpell(EVERY_MAN_FOR_HIMSELF_ALL); // human
     SHADOWMELD               = ai->initSpell(SHADOWMELD_ALL);
@@ -69,10 +69,10 @@ PlayerbotRogueAI::PlayerbotRogueAI(Player* const master, Player* const bot, Play
 
 PlayerbotRogueAI::~PlayerbotRogueAI() {}
 
-bool PlayerbotRogueAI::DoFirstCombatManeuver(Unit *pTarget)
+bool PlayerbotRogueAI::DoFirstCombatManeuver(Unit* pTarget)
 {
     PlayerbotAI* ai = GetAI();
-    Player * m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
 
     if (STEALTH > 0 && !m_bot->HasAura(STEALTH, EFFECT_INDEX_0) && ai->CastSpell(STEALTH, *m_bot))
     {
@@ -92,7 +92,7 @@ bool PlayerbotRogueAI::DoFirstCombatManeuver(Unit *pTarget)
     return false;
 }
 
-void PlayerbotRogueAI::DoNextCombatManeuver(Unit *pTarget)
+void PlayerbotRogueAI::DoNextCombatManeuver(Unit* pTarget)
 {
     if (!pTarget)
         return;
@@ -113,7 +113,7 @@ void PlayerbotRogueAI::DoNextCombatManeuver(Unit *pTarget)
             break;
     }
 
-    Player *m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
     Unit* pVictim = pTarget->getVictim();
     bool meleeReach = m_bot->CanReachWithMeleeAttack(pTarget);
 
@@ -133,14 +133,14 @@ void PlayerbotRogueAI::DoNextCombatManeuver(Unit *pTarget)
         }
        }*/
 
-    //Rouge like behaviour. ^^
-/*    if (VANISH > 0 && GetMaster()->isDead()) { //Causes the server to crash :( removed for now.
-        m_bot->AttackStop();
-        m_bot->RemoveAllAttackers();
-        ai->CastSpell(VANISH);
-   //        m_bot->RemoveAllSpellCooldown();
-        GetAI()->TellMaster("AttackStop, CombatStop, Vanish");
-    }*/
+    // Rouge like behaviour. ^^
+    /*    if (VANISH > 0 && GetMaster()->isDead()) { // Causes the server to crash :( removed for now.
+            m_bot->AttackStop();
+            m_bot->RemoveAllAttackers();
+            ai->CastSpell(VANISH);
+       //        m_bot->RemoveAllSpellCooldown();
+            GetAI()->TellMaster("AttackStop, CombatStop, Vanish");
+        }*/
 
     // decide what to do:
     if (pVictim == m_bot && CLOAK_OF_SHADOWS > 0 && pVictim->HasAura(SPELL_AURA_PERIODIC_DAMAGE) && !m_bot->HasAura(CLOAK_OF_SHADOWS, EFFECT_INDEX_0) && ai->CastSpell(CLOAK_OF_SHADOWS))
@@ -168,7 +168,7 @@ void PlayerbotRogueAI::DoNextCombatManeuver(Unit *pTarget)
         case RogueStealth:
             out << "Case Stealth";
             if (PICK_POCKET > 0 && (pTarget->GetCreatureTypeMask() & CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD) != 0 &&
-                !((Creature*)pTarget)->lootForPickPocketed && ai->CastSpell(PICK_POCKET, *pTarget))
+                    !((Creature*)pTarget)->lootForPickPocketed && ai->CastSpell(PICK_POCKET, *pTarget))
                 out << " > Pick Pocket";
             else if (PREMEDITATION > 0 && ai->CastSpell(PREMEDITATION, *pTarget))
                 out << " > Premeditation";
@@ -288,11 +288,11 @@ void PlayerbotRogueAI::DoNextCombatManeuver(Unit *pTarget)
 
 void PlayerbotRogueAI::DoNonCombatActions()
 {
-    PlayerbotAI *ai = GetAI();
+    PlayerbotAI* ai = GetAI();
     if (!ai)
         return;
 
-    Player * m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
     if (!m_bot)
         return;
 
@@ -322,7 +322,7 @@ void PlayerbotRogueAI::DoNonCombatActions()
 
     // Search and apply poisons to weapons
     // Mainhand ...
-    Item * poison, * weapon;
+    Item* poison, * weapon;
     weapon = m_bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
     if (weapon && weapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) == 0)
     {

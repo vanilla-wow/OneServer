@@ -22,57 +22,57 @@
 class PlayerbotAI;
 PlayerbotWarriorAI::PlayerbotWarriorAI(Player* const master, Player* const bot, PlayerbotAI* const ai) : PlayerbotClassAI(master, bot, ai)
 {
-    BATTLE_STANCE           = ai->initSpell(BATTLE_STANCE_1); //ARMS
-    CHARGE                  = ai->initSpell(CHARGE_1); //ARMS
+    BATTLE_STANCE           = ai->initSpell(BATTLE_STANCE_1); // ARMS
+    CHARGE                  = ai->initSpell(CHARGE_1); // ARMS
     OVERPOWER               = ai->initSpell(OVERPOWER_1); // ARMS
-    HEROIC_STRIKE           = ai->initSpell(HEROIC_STRIKE_1); //ARMS
-    REND                    = ai->initSpell(REND_1); //ARMS
-    THUNDER_CLAP            = ai->initSpell(THUNDER_CLAP_1);  //ARMS
-    HAMSTRING               = ai->initSpell(HAMSTRING_1);  //ARMS
-    MOCKING_BLOW            = ai->initSpell(MOCKING_BLOW_1);  //ARMS
-    RETALIATION             = ai->initSpell(RETALIATION_1);  //ARMS
-    SWEEPING_STRIKES        = ai->initSpell(SWEEPING_STRIKES_1); //ARMS
-    MORTAL_STRIKE           = ai->initSpell(MORTAL_STRIKE_1);  //ARMS
-    BLADESTORM              = ai->initSpell(BLADESTORM_1);  //ARMS
-    HEROIC_THROW            = ai->initSpell(HEROIC_THROW_1);  //ARMS
-    SHATTERING_THROW        = ai->initSpell(SHATTERING_THROW_1);  //ARMS
-    BLOODRAGE               = ai->initSpell(BLOODRAGE_1); //PROTECTION
-    DEFENSIVE_STANCE        = ai->initSpell(DEFENSIVE_STANCE_1); //PROTECTION
-    DEVASTATE               = ai->initSpell(DEVASTATE_1); //PROTECTION
-    SUNDER_ARMOR            = ai->initSpell(SUNDER_ARMOR_1); //PROTECTION
-    TAUNT                   = ai->initSpell(TAUNT_1); //PROTECTION
-    SHIELD_BASH             = ai->initSpell(SHIELD_BASH_1); //PROTECTION
-    REVENGE                 = ai->initSpell(REVENGE_1); //PROTECTION
-    SHIELD_BLOCK            = ai->initSpell(SHIELD_BLOCK_1); //PROTECTION
-    DISARM                  = ai->initSpell(DISARM_1); //PROTECTION
-    SHIELD_WALL             = ai->initSpell(SHIELD_WALL_1); //PROTECTION
-    SHIELD_SLAM             = ai->initSpell(SHIELD_SLAM_1); //PROTECTION
-    VIGILANCE               = ai->initSpell(VIGILANCE_1); //PROTECTION
-    DEVASTATE               = ai->initSpell(DEVASTATE_1); //PROTECTION
-    SHOCKWAVE               = ai->initSpell(SHOCKWAVE_1); //PROTECTION
-    CONCUSSION_BLOW         = ai->initSpell(CONCUSSION_BLOW_1); //PROTECTION
-    SPELL_REFLECTION        = ai->initSpell(SPELL_REFLECTION_1); //PROTECTION
-    LAST_STAND              = ai->initSpell(LAST_STAND_1); //PROTECTION
-    BATTLE_SHOUT            = ai->initSpell(BATTLE_SHOUT_1); //FURY
-    DEMORALIZING_SHOUT      = ai->initSpell(DEMORALIZING_SHOUT_1); //FURY
-    CLEAVE                  = ai->initSpell(CLEAVE_1); //FURY
-    INTIMIDATING_SHOUT      = ai->initSpell(INTIMIDATING_SHOUT_1); //FURY
-    EXECUTE                 = ai->initSpell(EXECUTE_1); //FURY
-    CHALLENGING_SHOUT       = ai->initSpell(CHALLENGING_SHOUT_1); //FURY
-    SLAM                    = ai->initSpell(SLAM_1); //FURY
-    BERSERKER_STANCE        = ai->initSpell(BERSERKER_STANCE_1); //FURY
-    INTERCEPT               = ai->initSpell(INTERCEPT_1); //FURY
-    DEATH_WISH              = ai->initSpell(DEATH_WISH_1); //FURY
-    BERSERKER_RAGE          = ai->initSpell(BERSERKER_RAGE_1); //FURY
-    WHIRLWIND               = ai->initSpell(WHIRLWIND_1); //FURY
-    PUMMEL                  = ai->initSpell(PUMMEL_1); //FURY
-    BLOODTHIRST             = ai->initSpell(BLOODTHIRST_1); //FURY
-    RECKLESSNESS            = ai->initSpell(RECKLESSNESS_1); //FURY
+    HEROIC_STRIKE           = ai->initSpell(HEROIC_STRIKE_1); // ARMS
+    REND                    = ai->initSpell(REND_1); // ARMS
+    THUNDER_CLAP            = ai->initSpell(THUNDER_CLAP_1);// ARMS
+    HAMSTRING               = ai->initSpell(HAMSTRING_1);  // ARMS
+    MOCKING_BLOW            = ai->initSpell(MOCKING_BLOW_1);// ARMS
+    RETALIATION             = ai->initSpell(RETALIATION_1); // ARMS
+    SWEEPING_STRIKES        = ai->initSpell(SWEEPING_STRIKES_1); // ARMS
+    MORTAL_STRIKE           = ai->initSpell(MORTAL_STRIKE_1);  // ARMS
+    BLADESTORM              = ai->initSpell(BLADESTORM_1);  // ARMS
+    HEROIC_THROW            = ai->initSpell(HEROIC_THROW_1);// ARMS
+    SHATTERING_THROW        = ai->initSpell(SHATTERING_THROW_1);  // ARMS
+    BLOODRAGE               = ai->initSpell(BLOODRAGE_1); // PROTECTION
+    DEFENSIVE_STANCE        = ai->initSpell(DEFENSIVE_STANCE_1); // PROTECTION
+    DEVASTATE               = ai->initSpell(DEVASTATE_1); // PROTECTION
+    SUNDER_ARMOR            = ai->initSpell(SUNDER_ARMOR_1);// PROTECTION
+    TAUNT                   = ai->initSpell(TAUNT_1); // PROTECTION
+    SHIELD_BASH             = ai->initSpell(SHIELD_BASH_1); // PROTECTION
+    REVENGE                 = ai->initSpell(REVENGE_1); // PROTECTION
+    SHIELD_BLOCK            = ai->initSpell(SHIELD_BLOCK_1);// PROTECTION
+    DISARM                  = ai->initSpell(DISARM_1); // PROTECTION
+    SHIELD_WALL             = ai->initSpell(SHIELD_WALL_1); // PROTECTION
+    SHIELD_SLAM             = ai->initSpell(SHIELD_SLAM_1); // PROTECTION
+    VIGILANCE               = ai->initSpell(VIGILANCE_1); // PROTECTION
+    DEVASTATE               = ai->initSpell(DEVASTATE_1); // PROTECTION
+    SHOCKWAVE               = ai->initSpell(SHOCKWAVE_1); // PROTECTION
+    CONCUSSION_BLOW         = ai->initSpell(CONCUSSION_BLOW_1); // PROTECTION
+    SPELL_REFLECTION        = ai->initSpell(SPELL_REFLECTION_1); // PROTECTION
+    LAST_STAND              = ai->initSpell(LAST_STAND_1); // PROTECTION
+    BATTLE_SHOUT            = ai->initSpell(BATTLE_SHOUT_1);// FURY
+    DEMORALIZING_SHOUT      = ai->initSpell(DEMORALIZING_SHOUT_1); // FURY
+    CLEAVE                  = ai->initSpell(CLEAVE_1); // FURY
+    INTIMIDATING_SHOUT      = ai->initSpell(INTIMIDATING_SHOUT_1); // FURY
+    EXECUTE                 = ai->initSpell(EXECUTE_1); // FURY
+    CHALLENGING_SHOUT       = ai->initSpell(CHALLENGING_SHOUT_1); // FURY
+    SLAM                    = ai->initSpell(SLAM_1); // FURY
+    BERSERKER_STANCE        = ai->initSpell(BERSERKER_STANCE_1); // FURY
+    INTERCEPT               = ai->initSpell(INTERCEPT_1); // FURY
+    DEATH_WISH              = ai->initSpell(DEATH_WISH_1); // FURY
+    BERSERKER_RAGE          = ai->initSpell(BERSERKER_RAGE_1); // FURY
+    WHIRLWIND               = ai->initSpell(WHIRLWIND_1); // FURY
+    PUMMEL                  = ai->initSpell(PUMMEL_1); // FURY
+    BLOODTHIRST             = ai->initSpell(BLOODTHIRST_1); // FURY
+    RECKLESSNESS            = ai->initSpell(RECKLESSNESS_1);// FURY
     RAMPAGE                 = 0; // passive
-    HEROIC_FURY             = ai->initSpell(HEROIC_FURY_1); //FURY
-    COMMANDING_SHOUT        = ai->initSpell(COMMANDING_SHOUT_1); //FURY
-    ENRAGED_REGENERATION    = ai->initSpell(ENRAGED_REGENERATION_1); //FURY
-    PIERCING_HOWL           = ai->initSpell(PIERCING_HOWL_1); //FURY
+    HEROIC_FURY             = ai->initSpell(HEROIC_FURY_1); // FURY
+    COMMANDING_SHOUT        = ai->initSpell(COMMANDING_SHOUT_1); // FURY
+    ENRAGED_REGENERATION    = ai->initSpell(ENRAGED_REGENERATION_1); // FURY
+    PIERCING_HOWL           = ai->initSpell(PIERCING_HOWL_1); // FURY
 
     RECENTLY_BANDAGED       = 11196; // first aid check
 
@@ -81,18 +81,18 @@ PlayerbotWarriorAI::PlayerbotWarriorAI(Player* const master, Player* const bot, 
     STONEFORM               = ai->initSpell(STONEFORM_ALL); // dwarf
     ESCAPE_ARTIST           = ai->initSpell(ESCAPE_ARTIST_ALL); // gnome
     EVERY_MAN_FOR_HIMSELF   = ai->initSpell(EVERY_MAN_FOR_HIMSELF_ALL); // human
-    SHADOWMELD              = ai->initSpell(SHADOWMELD_ALL); // night elf
+    SHADOWMELD              = ai->initSpell(SHADOWMELD_ALL);// night elf
     BLOOD_FURY              = ai->initSpell(BLOOD_FURY_MELEE_CLASSES); // orc
     WAR_STOMP               = ai->initSpell(WAR_STOMP_ALL); // tauren
-    BERSERKING              = ai->initSpell(BERSERKING_ALL); // troll
+    BERSERKING              = ai->initSpell(BERSERKING_ALL);// troll
     WILL_OF_THE_FORSAKEN    = ai->initSpell(WILL_OF_THE_FORSAKEN_ALL); // undead
 }
 PlayerbotWarriorAI::~PlayerbotWarriorAI() {}
 
-bool PlayerbotWarriorAI::DoFirstCombatManeuver(Unit *pTarget)
+bool PlayerbotWarriorAI::DoFirstCombatManeuver(Unit* pTarget)
 {
-    Player *m_bot = GetPlayerBot();
-    PlayerbotAI *ai = GetAI();
+    Player* m_bot = GetPlayerBot();
+    PlayerbotAI* ai = GetAI();
     float fTargetDist = m_bot->GetDistance(pTarget);
 
     if (ai->IsTank() && DEFENSIVE_STANCE > 0 && !m_bot->HasAura(DEFENSIVE_STANCE, EFFECT_INDEX_0) && ai->CastSpell(DEFENSIVE_STANCE))
@@ -134,7 +134,7 @@ bool PlayerbotWarriorAI::DoFirstCombatManeuver(Unit *pTarget)
     return false;
 }
 
-void PlayerbotWarriorAI::DoNextCombatManeuver(Unit *pTarget)
+void PlayerbotWarriorAI::DoNextCombatManeuver(Unit* pTarget)
 {
     PlayerbotAI* ai = GetAI();
     if (!ai)
@@ -151,11 +151,11 @@ void PlayerbotWarriorAI::DoNextCombatManeuver(Unit *pTarget)
     }
     // ------- Non Duel combat ----------
 
-    //ai->SetMovementOrder( PlayerbotAI::MOVEMENT_FOLLOW, GetMaster() ); // dont want to melee mob
+    // ai->SetMovementOrder( PlayerbotAI::MOVEMENT_FOLLOW, GetMaster() ); // dont want to melee mob
 
     // Damage Attacks
 
-    Player *m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
     Unit* pVictim = pTarget->getVictim();
     float fTargetDist = m_bot->GetDistance(pTarget);
 
@@ -306,8 +306,8 @@ void PlayerbotWarriorAI::DoNextCombatManeuver(Unit *pTarget)
 
 void PlayerbotWarriorAI::DoNonCombatActions()
 {
-    PlayerbotAI *ai = GetAI();
-    Player * m_bot = GetPlayerBot();
+    PlayerbotAI* ai = GetAI();
+    Player* m_bot = GetPlayerBot();
     if (!m_bot)
         return;
 
@@ -318,8 +318,8 @@ void PlayerbotWarriorAI::DoNonCombatActions()
     // Inserted line to battle shout m_bot->HasAura( COMMANDING_SHOUT, EFFECT_INDEX_0)
     // Natsukawa
     if (((COMMANDING_SHOUT > 0 && !m_bot->HasAura(COMMANDING_SHOUT, EFFECT_INDEX_0)) ||
-         (BATTLE_SHOUT > 0 && !m_bot->HasAura(BATTLE_SHOUT, EFFECT_INDEX_0))) &&
-        ai->GetRageAmount() < 10 && BLOODRAGE > 0 && !m_bot->HasAura(BLOODRAGE, EFFECT_INDEX_0))
+            (BATTLE_SHOUT > 0 && !m_bot->HasAura(BATTLE_SHOUT, EFFECT_INDEX_0))) &&
+            ai->GetRageAmount() < 10 && BLOODRAGE > 0 && !m_bot->HasAura(BLOODRAGE, EFFECT_INDEX_0))
         // we do have a useful shout, no rage coming but can cast bloodrage... do it
         ai->CastSpell(BLOODRAGE, *m_bot);
     else if (COMMANDING_SHOUT > 0 && !m_bot->HasAura(COMMANDING_SHOUT, EFFECT_INDEX_0))

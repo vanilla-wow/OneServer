@@ -97,7 +97,7 @@ PlayerbotWarlockAI::PlayerbotWarlockAI(Player* const master, Player* const bot, 
 
 PlayerbotWarlockAI::~PlayerbotWarlockAI() {}
 
-void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
+void PlayerbotWarlockAI::DoNextCombatManeuver(Unit* pTarget)
 {
     PlayerbotAI* ai = GetAI();
     if (!ai)
@@ -115,11 +115,11 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
 
     // ------- Non Duel combat ----------
 
-    //ai->SetMovementOrder( PlayerbotAI::MOVEMENT_FOLLOW, GetMaster() ); // dont want to melee mob
+    // ai->SetMovementOrder( PlayerbotAI::MOVEMENT_FOLLOW, GetMaster() ); // dont want to melee mob
 
-    Player *m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
     Unit* pVictim = pTarget->getVictim();
-    Pet *pet = m_bot->GetPet();
+    Pet* pet = m_bot->GetPet();
 
     // Empower demon
     if (pet && DEMONIC_EMPOWERMENT && !m_bot->HasSpellCooldown(DEMONIC_EMPOWERMENT))
@@ -145,7 +145,7 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
     }
     if (SHOOT > 0 && ai->GetCombatStyle() == PlayerbotAI::COMBAT_RANGED && !m_bot->FindCurrentSpellBySpellId(SHOOT))
         ai->CastSpell(SHOOT, *pTarget);
-    //ai->TellMaster( "started auto shot." );
+    // ai->TellMaster( "started auto shot." );
     else if (SHOOT > 0 && m_bot->FindCurrentSpellBySpellId(SHOOT))
         m_bot->InterruptNonMeleeSpells(true, SHOOT);
 
@@ -182,8 +182,8 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
                 break;
             }
             LastSpellCurse = 0;
-        //SpellSequence = SPELL_AFFLICTION;
-        //break;
+        // SpellSequence = SPELL_AFFLICTION;
+        // break;
 
         case SPELL_AFFLICTION:
             if (LIFE_TAP && LastSpellAffliction < 1 && ai->GetManaPercent() <= 50 && ai->GetHealthPercent() > 50)
@@ -203,7 +203,7 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
             else if (DRAIN_SOUL && pTarget->GetHealth() < pTarget->GetMaxHealth() * 0.40 && !pTarget->HasAura(DRAIN_SOUL) && LastSpellAffliction < 3)
             {
                 ai->CastSpell(DRAIN_SOUL, *pTarget);
-                //ai->SetIgnoreUpdateTime(15);
+                // ai->SetIgnoreUpdateTime(15);
                 SpellSequence = SPELL_DESTRUCTION;
                 ++LastSpellAffliction;
                 break;
@@ -211,7 +211,7 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
             else if (DRAIN_LIFE && LastSpellAffliction < 4 && !pTarget->HasAura(DRAIN_SOUL) && !pTarget->HasAura(SEED_OF_CORRUPTION) && !pTarget->HasAura(DRAIN_LIFE) && !pTarget->HasAura(DRAIN_MANA) && ai->GetHealthPercent() <= 70)
             {
                 ai->CastSpell(DRAIN_LIFE, *pTarget);
-                //ai->SetIgnoreUpdateTime(5);
+                // ai->SetIgnoreUpdateTime(5);
                 SpellSequence = SPELL_DESTRUCTION;
                 ++LastSpellAffliction;
                 break;
@@ -248,8 +248,8 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
             else if (FEAR && !pTarget->HasAura(FEAR) && pVictim == m_bot && ai->GetAttackerCount() >= 2 && LastSpellAffliction < 9)
             {
                 ai->CastSpell(FEAR, *pTarget);
-                //ai->TellMaster("casting fear!");
-                //ai->SetIgnoreUpdateTime(1.5);
+                // ai->TellMaster("casting fear!");
+                // ai->SetIgnoreUpdateTime(1.5);
                 SpellSequence = SPELL_DESTRUCTION;
                 ++LastSpellAffliction;
                 break;
@@ -263,8 +263,8 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
                 break;
             }
             LastSpellAffliction = 0;
-        //SpellSequence = SPELL_DESTRUCTION;
-        //break;
+        // SpellSequence = SPELL_DESTRUCTION;
+        // break;
 
         case SPELL_DESTRUCTION:
             if (SHADOWFURY && LastSpellDestruction < 1 && !pTarget->HasAura(SHADOWFURY))
@@ -284,8 +284,8 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
             else if (RAIN_OF_FIRE && LastSpellDestruction < 3 && ai->GetAttackerCount() >= 3)
             {
                 ai->CastSpell(RAIN_OF_FIRE, *pTarget);
-                //ai->TellMaster("casting rain of fire!");
-                //ai->SetIgnoreUpdateTime(8);
+                // ai->TellMaster("casting rain of fire!");
+                // ai->SetIgnoreUpdateTime(8);
                 SpellSequence = SPELL_CURSES;
                 ++LastSpellDestruction;
                 break;
@@ -328,7 +328,7 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
             else if (SOUL_FIRE && LastSpellDestruction < 9)
             {
                 ai->CastSpell(SOUL_FIRE, *pTarget);
-                //ai->SetIgnoreUpdateTime(6);
+                // ai->SetIgnoreUpdateTime(6);
                 SpellSequence = SPELL_CURSES;
                 ++LastSpellDestruction;
                 break;
@@ -351,7 +351,7 @@ void PlayerbotWarlockAI::DoNextCombatManeuver(Unit *pTarget)
             {
                 ai->CastSpell(HELLFIRE);
                 ai->TellMaster("casting hellfire!");
-                //ai->SetIgnoreUpdateTime(15);
+                // ai->SetIgnoreUpdateTime(15);
                 SpellSequence = SPELL_CURSES;
                 ++LastSpellDestruction;
                 break;
@@ -368,12 +368,12 @@ void PlayerbotWarlockAI::DoNonCombatActions()
 {
     SpellSequence = SPELL_CURSES;
 
-    PlayerbotAI *ai = GetAI();
-    Player * m_bot = GetPlayerBot();
+    PlayerbotAI* ai = GetAI();
+    Player* m_bot = GetPlayerBot();
     if (!ai || !m_bot)
         return;
 
-    Pet *pet = m_bot->GetPet();
+    Pet* pet = m_bot->GetPet();
 
     // Initialize pet spells
     if (pet && pet->GetEntry() != m_lastDemon)
@@ -466,7 +466,7 @@ void PlayerbotWarlockAI::DoNonCombatActions()
         else
         {
             uint32 soulStoneSpell = soulStone->GetProto()->Spells[0].SpellId;
-            Player * master = GetMaster();
+            Player* master = GetMaster();
             if (!master->HasAura(soulStoneSpell) && !m_bot->HasSpellCooldown(soulStoneSpell))
             {
                 ai->UseItem(soulStone, master);
@@ -538,7 +538,7 @@ void PlayerbotWarlockAI::DoNonCombatActions()
         }
     }
 
-    //Heal Voidwalker
+    // Heal Voidwalker
     if (pet && pet->GetEntry() == DEMON_VOIDWALKER && CONSUME_SHADOWS && pet->GetHealthPercent() < 75 && !pet->HasAura(CONSUME_SHADOWS))
         ai->CastPetSpell(CONSUME_SHADOWS);
 

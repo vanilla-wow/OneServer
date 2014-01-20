@@ -77,13 +77,13 @@ PlayerbotMageAI::PlayerbotMageAI(Player* const master, Player* const bot, Player
     GIFT_OF_THE_NAARU       = ai->initSpell(GIFT_OF_THE_NAARU_MAGE); // draenei
     ESCAPE_ARTIST           = ai->initSpell(ESCAPE_ARTIST_ALL); // gnome
     EVERY_MAN_FOR_HIMSELF   = ai->initSpell(EVERY_MAN_FOR_HIMSELF_ALL); // human
-    BERSERKING              = ai->initSpell(BERSERKING_ALL); // troll
+    BERSERKING              = ai->initSpell(BERSERKING_ALL);// troll
     WILL_OF_THE_FORSAKEN    = ai->initSpell(WILL_OF_THE_FORSAKEN_ALL); // undead
 }
 
 PlayerbotMageAI::~PlayerbotMageAI() {}
 
-void PlayerbotMageAI::DoNextCombatManeuver(Unit *pTarget)
+void PlayerbotMageAI::DoNextCombatManeuver(Unit* pTarget)
 {
     PlayerbotAI* ai = GetAI();
     if (!ai)
@@ -99,10 +99,10 @@ void PlayerbotMageAI::DoNextCombatManeuver(Unit *pTarget)
 
     // ------- Non Duel combat ----------
 
-    //ai->SetMovementOrder( PlayerbotAI::MOVEMENT_FOLLOW, GetMaster() ); // dont want to melee mob
+    // ai->SetMovementOrder( PlayerbotAI::MOVEMENT_FOLLOW, GetMaster() ); // dont want to melee mob
 
     // Damage Spells (primitive example)
-    Player *m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
     Unit* pVictim = pTarget->getVictim();
     bool meleeReach = m_bot->CanReachWithMeleeAttack(pTarget);
 
@@ -113,7 +113,7 @@ void PlayerbotMageAI::DoNextCombatManeuver(Unit *pTarget)
     }
     if (SHOOT > 0 && ai->GetCombatStyle() == PlayerbotAI::COMBAT_RANGED && !m_bot->FindCurrentSpellBySpellId(SHOOT))
         ai->CastSpell(SHOOT, *pTarget);
-    //ai->TellMaster( "started auto shot." );
+    // ai->TellMaster( "started auto shot." );
     else if (SHOOT > 0 && m_bot->FindCurrentSpellBySpellId(SHOOT))
         m_bot->InterruptNonMeleeSpells(true, SHOOT);
 
@@ -206,8 +206,8 @@ void PlayerbotMageAI::DoNextCombatManeuver(Unit *pTarget)
                 break;
             }
             LastSpellFrost = 0;
-        //SpellSequence = SPELL_FIRE;
-        //break;
+        // SpellSequence = SPELL_FIRE;
+        // break;
 
         case SPELL_FIRE:
             if (FIRE_WARD > 0 && !m_bot->HasAura(FIRE_WARD, EFFECT_INDEX_0) && LastSpellFire < 1 && ai->GetManaPercent() >= 3)
@@ -288,8 +288,8 @@ void PlayerbotMageAI::DoNextCombatManeuver(Unit *pTarget)
                 break;
             }
             LastSpellFire = 0;
-        //SpellSequence = SPELL_ARCANE;
-        //break;
+        // SpellSequence = SPELL_ARCANE;
+        // break;
 
         case SPELL_ARCANE:
             if (ARCANE_POWER > 0 && LastSpellArcane < 1 && ai->GetManaPercent() >= 37)
@@ -366,8 +366,8 @@ void PlayerbotMageAI::DoNextCombatManeuver(Unit *pTarget)
 
 void PlayerbotMageAI::DoNonCombatActions()
 {
-    Player * m_bot = GetPlayerBot();
-    Player * master = GetMaster();
+    Player* m_bot = GetPlayerBot();
+    Player* master = GetMaster();
 
     if (!m_bot || !master)
         return;
@@ -407,7 +407,7 @@ void PlayerbotMageAI::DoNonCombatActions()
         Group::MemberSlotList const& groupSlot = GetMaster()->GetGroup()->GetMemberSlots();
         for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
         {
-            Player *tPlayer = sObjectMgr.GetPlayer(itr->guid);
+            Player* tPlayer = sObjectMgr.GetPlayer(itr->guid);
             if (!tPlayer || !tPlayer->isAlive() || tPlayer == m_bot)
                 continue;
             // buff
@@ -477,8 +477,8 @@ void PlayerbotMageAI::DoNonCombatActions()
 
 bool PlayerbotMageAI::BuffPlayer(Player* target)
 {
-    PlayerbotAI * ai = GetAI();
-    Pet * pet = target->GetPet();
+    PlayerbotAI* ai = GetAI();
+    Pet* pet = target->GetPet();
 
     if (pet && pet->getPowerType() == POWER_MANA && ai->Buff(ARCANE_INTELLECT, pet))
         return true;

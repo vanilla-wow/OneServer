@@ -66,7 +66,7 @@ PlayerbotShamanAI::PlayerbotShamanAI(Player* const master, Player* const bot, Pl
     EARTH_SHOCK              = ai->initSpell(EARTH_SHOCK_1);
     FLAME_SHOCK              = ai->initSpell(FLAME_SHOCK_1);
     PURGE                    = ai->initSpell(PURGE_1);
-    WIND_SHOCK               = 0; //NPC spell
+    WIND_SHOCK               = 0; // NPC spell
     FROST_SHOCK              = ai->initSpell(FROST_SHOCK_1);
     CHAIN_LIGHTNING          = ai->initSpell(CHAIN_LIGHTNING_1);
     LAVA_BURST               = ai->initSpell(LAVA_BURST_1);
@@ -84,16 +84,16 @@ PlayerbotShamanAI::PlayerbotShamanAI(Player* const master, Player* const bot, Pl
     // racial
     GIFT_OF_THE_NAARU        = ai->initSpell(GIFT_OF_THE_NAARU_SHAMAN); // draenei
     BLOOD_FURY               = ai->initSpell(BLOOD_FURY_SHAMAN); // orc
-    WAR_STOMP                = ai->initSpell(WAR_STOMP_ALL); // tauren
+    WAR_STOMP                = ai->initSpell(WAR_STOMP_ALL);// tauren
     BERSERKING               = ai->initSpell(BERSERKING_ALL); // troll
 }
 
 PlayerbotShamanAI::~PlayerbotShamanAI() {}
 
-void PlayerbotShamanAI::HealTarget(Unit &target, uint8 hp)
+void PlayerbotShamanAI::HealTarget(Unit& target, uint8 hp)
 {
     PlayerbotAI* ai = GetAI();
-    Player *m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
 
     if (hp < 30 && HEALING_WAVE > 0 && ai->GetManaPercent() >= 32)
         ai->CastSpell(HEALING_WAVE, target);
@@ -110,9 +110,9 @@ void PlayerbotShamanAI::HealTarget(Unit &target, uint8 hp)
         uint32 dispelMask2  = GetDispellMask(DISPEL_DISEASE);
         uint32 dispelMask3  = GetDispellMask(DISPEL_CURSE);
         Unit::SpellAuraHolderMap const& auras = target.GetSpellAuraHolderMap();
-        for(Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+        for (Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
         {
-            SpellAuraHolder *holder = itr->second;
+            SpellAuraHolder* holder = itr->second;
             if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
             {
                 if (holder->GetSpellProto()->Dispel == DISPEL_POISON)
@@ -133,7 +133,7 @@ void PlayerbotShamanAI::HealTarget(Unit &target, uint8 hp)
     // end HealTarget
 }
 
-void PlayerbotShamanAI::DoNextCombatManeuver(Unit *pTarget)
+void PlayerbotShamanAI::DoNextCombatManeuver(Unit* pTarget)
 {
     PlayerbotAI* ai = GetAI();
     if (!ai)
@@ -152,8 +152,8 @@ void PlayerbotShamanAI::DoNextCombatManeuver(Unit *pTarget)
 
     ai->SetMovementOrder(PlayerbotAI::MOVEMENT_FOLLOW, GetMaster());   // dont want to melee mob <----changed
 
-    Player *m_bot = GetPlayerBot();
-    Group *m_group = m_bot->GetGroup();
+    Player* m_bot = GetPlayerBot();
+    Group* m_group = m_bot->GetGroup();
 
     // Heal myself
     if (ai->GetHealthPercent() < 30 && ai->GetManaPercent() >= 32)
@@ -161,7 +161,7 @@ void PlayerbotShamanAI::DoNextCombatManeuver(Unit *pTarget)
     else if (ai->GetHealthPercent() < 50 && ai->GetManaPercent() >= 19)
         ai->CastSpell(LESSER_HEALING_WAVE);
     else if (ai->GetHealthPercent() < 70)
-        HealTarget (*m_bot, ai->GetHealthPercent());
+        HealTarget(*m_bot, ai->GetHealthPercent());
 
     // Heal master
     uint32 masterHP = GetMaster()->GetHealth() * 100 / GetMaster()->GetMaxHealth();
@@ -170,7 +170,7 @@ void PlayerbotShamanAI::DoNextCombatManeuver(Unit *pTarget)
         if (masterHP < 30 && ai->GetManaPercent() >= 32)
             ai->CastSpell(HEALING_WAVE, *(GetMaster()));
         else if (masterHP < 70)
-            HealTarget (*GetMaster(), masterHP);
+            HealTarget(*GetMaster(), masterHP);
     }
 
     // Heal group
@@ -179,7 +179,7 @@ void PlayerbotShamanAI::DoNextCombatManeuver(Unit *pTarget)
         Group::MemberSlotList const& groupSlot = m_group->GetMemberSlots();
         for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
         {
-            Player *m_groupMember = sObjectMgr.GetPlayer(itr->guid);
+            Player* m_groupMember = sObjectMgr.GetPlayer(itr->guid);
             if (!m_groupMember || !m_groupMember->isAlive())
                 continue;
 
@@ -320,8 +320,8 @@ void PlayerbotShamanAI::DoNextCombatManeuver(Unit *pTarget)
                 break;
             }
             LastSpellEnhancement = LastSpellEnhancement + 1;
-        //SpellSequence = SPELL_RESTORATION;
-        //break;
+        // SpellSequence = SPELL_RESTORATION;
+        // break;
 
         case SPELL_RESTORATION:
             if (HEALING_STREAM_TOTEM > 0 && LastSpellRestoration < 3 && ai->GetHealthPercent() < 50 && (!m_bot->HasAura(HEALING_STREAM_TOTEM, EFFECT_INDEX_0)) && (!m_bot->HasAura(MANA_SPRING_TOTEM, EFFECT_INDEX_0)) && ai->GetManaPercent() >= 4)
@@ -359,8 +359,8 @@ void PlayerbotShamanAI::DoNextCombatManeuver(Unit *pTarget)
                 break;
             }
             LastSpellRestoration = LastSpellRestoration + 1;
-        //SpellSequence = SPELL_ELEMENTAL;
-        //break;
+        // SpellSequence = SPELL_ELEMENTAL;
+        // break;
 
         case SPELL_ELEMENTAL:
             if (LIGHTNING_BOLT > 0 && LastSpellElemental == 1 && ai->GetManaPercent() >= 13)
@@ -492,7 +492,7 @@ void PlayerbotShamanAI::DoNextCombatManeuver(Unit *pTarget)
 void PlayerbotShamanAI::DoNonCombatActions()
 {
     PlayerbotAI* ai = GetAI();
-    Player * m_bot = GetPlayerBot();
+    Player* m_bot = GetPlayerBot();
     if (!m_bot)
         return;
 
@@ -507,19 +507,19 @@ void PlayerbotShamanAI::DoNonCombatActions()
         (!m_bot->HasAura(WATER_SHIELD, EFFECT_INDEX_0) && !m_bot->HasAura(LIGHTNING_SHIELD, EFFECT_INDEX_0) && ai->CastSpell(WATER_SHIELD, *m_bot));
     else if (LIGHTNING_SHIELD > 0)
         (!m_bot->HasAura(LIGHTNING_SHIELD, EFFECT_INDEX_0) && !m_bot->HasAura(WATER_SHIELD, EFFECT_INDEX_0) && ai->CastSpell(LIGHTNING_SHIELD, *m_bot));
-/*
-       // buff myself weapon
-       if (ROCKBITER_WEAPON > 0)
-            (!m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(WINDFURY_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(ROCKBITER_WEAPON,*m_bot) );
-       else if (EARTHLIVING_WEAPON > 0)
-            (!m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(WINDFURY_WEAPON,*m_bot) );
-       else if (WINDFURY_WEAPON > 0)
-            (!m_bot->HasAura(WINDFURY_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(WINDFURY_WEAPON,*m_bot) );
-       else if (FLAMETONGUE_WEAPON > 0)
-            (!m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(WINDFURY_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(FLAMETONGUE_WEAPON,*m_bot) );
-       else if (FROSTBRAND_WEAPON > 0)
-            (!m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(WINDFURY_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(FROSTBRAND_WEAPON,*m_bot) );
- */
+    /*
+           // buff myself weapon
+           if (ROCKBITER_WEAPON > 0)
+                (!m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(WINDFURY_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(ROCKBITER_WEAPON,*m_bot) );
+           else if (EARTHLIVING_WEAPON > 0)
+                (!m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(WINDFURY_WEAPON,*m_bot) );
+           else if (WINDFURY_WEAPON > 0)
+                (!m_bot->HasAura(WINDFURY_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(WINDFURY_WEAPON,*m_bot) );
+           else if (FLAMETONGUE_WEAPON > 0)
+                (!m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(WINDFURY_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(FLAMETONGUE_WEAPON,*m_bot) );
+           else if (FROSTBRAND_WEAPON > 0)
+                (!m_bot->HasAura(FROSTBRAND_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(EARTHLIVING_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(WINDFURY_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(FLAMETONGUE_WEAPON, EFFECT_INDEX_0) && !m_bot->HasAura(ROCKBITER_WEAPON, EFFECT_INDEX_0) && ai->CastSpell(FROSTBRAND_WEAPON,*m_bot) );
+     */
     // mana check
     if (m_bot->getStandState() != UNIT_STAND_STATE_STAND)
         m_bot->SetStandState(UNIT_STAND_STATE_STAND);
@@ -559,7 +559,7 @@ void PlayerbotShamanAI::DoNonCombatActions()
         Group::MemberSlotList const& groupSlot = GetMaster()->GetGroup()->GetMemberSlots();
         for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
         {
-            Player *tPlayer = sObjectMgr.GetPlayer(itr->guid);
+            Player* tPlayer = sObjectMgr.GetPlayer(itr->guid);
             if (!tPlayer || !tPlayer->isAlive())
                 continue;
 
