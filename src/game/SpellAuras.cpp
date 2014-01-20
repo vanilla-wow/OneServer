@@ -3619,6 +3619,13 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
 
     if (apply)
     {
+        // remove stealth for set target
+        if (GetSpellProto()->SpellFamilyName == SPELLFAMILY_ROGUE && GetSpellProto()->SpellFamilyFlags & UI64LIT(0x0000000000000080))
+        {
+            if (target->HasStealthAura())
+                target->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+        }
+
         // Frost stun aura -> freeze/unfreeze target
         if (GetSpellSchoolMask(GetSpellProto()) & SPELL_SCHOOL_MASK_FROST)
             target->ModifyAuraState(AURA_STATE_FROZEN, apply);
