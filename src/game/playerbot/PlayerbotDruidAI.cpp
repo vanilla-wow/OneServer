@@ -17,7 +17,7 @@
  */
 
 #include "PlayerbotDruidAI.h"
-#include "../SpellAuras.h"
+#include "SpellAuras.h"
 
 class PlayerbotAI;
 

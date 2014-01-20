@@ -18,7 +18,7 @@
 
 #include "PlayerbotPaladinAI.h"
 #include "PlayerbotMgr.h"
-#include "../SpellAuras.h"
+#include "SpellAuras.h"
 
 class PlayerbotAI;
 

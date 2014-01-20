@@ -18,17 +18,16 @@
 
 #include "Config/Config.h"
 #include "config.h"
-#include "../Player.h"
+#include "Player.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotMgr.h"
 #include "WorldPacket.h"
-#include "../Chat.h"
-#include "../ObjectMgr.h"
-#include "../GossipDef.h"
-#include "../Chat.h"
-#include "../Language.h"
-#include "../WaypointMovementGenerator.h"
-#include "../Guild.h"
+#include "Chat.h"
+#include "ObjectMgr.h"
+#include "GossipDef.h"
+#include "Language.h"
+#include "WaypointMovementGenerator.h"
+#include "Guild.h"
 
 class LoginQueryHolder;
 class CharacterHandler;

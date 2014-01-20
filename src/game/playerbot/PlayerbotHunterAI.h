@@ -20,7 +20,7 @@
 #define _PLAYERHUNTERAI_H
 
 #include "PlayerbotClassAI.h"
-#include "../Spell.h"
+#include "Spell.h"
 
 enum
 {
