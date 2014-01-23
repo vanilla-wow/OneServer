@@ -353,6 +353,45 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage = damage * unitTarget->GetMaxHealth() / 100;
                         break;
                     }
+                    // Thaddius' charges, don't deal dmg to units with the same charge but give them the buff:
+                    // Positive Charge
+                    case 28062:
+                    {
+                        // remove pet from damage and buff list
+                        if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        {
+                              damage = 0;
+                              break;
+                        }
+                        // If target is not (+) charged, then just deal dmg
+                        if (!unitTarget->HasAura(28059, EFFECT_INDEX_0))
+                            break;
+
+                        if (m_caster != unitTarget)
+                            m_caster->CastSpell(m_caster, 29659, true);
+
+                        damage = 0;
+                        break;
+                    }
+                    // Negative Charge
+                    case 28085:
+                    {
+                        // remove pet from damage and buff list
+                        if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        {
+                              damage = 0;
+                              break;
+                        }
+                        // If target is not (-) charged, then just deal dmg
+                        if (!unitTarget->HasAura(28084, EFFECT_INDEX_0))
+                            break;
+
+                        if (m_caster != unitTarget)
+                            m_caster->CastSpell(m_caster, 29660, true);
+
+                        damage = 0;
+                        break;
+                    }
                     // Cataclysmic Bolt
                     case 38441:
                         damage = unitTarget->GetMaxHealth() / 2;
@@ -1073,6 +1112,23 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         m_caster->RemoveAurasDueToSpell(28734);
                     }
                     return;
+                }
+                case 28089:                                 // Polarity Shift (Thaddius - Naxxramas)
+                {
+                    if (!unitTarget)
+                        return;
+
+                    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // neutralize the target
+                    if (unitTarget->HasAura(28059, EFFECT_INDEX_0) ) unitTarget->RemoveAurasDueToSpell(28059);
+                    if (unitTarget->HasAura(29659, EFFECT_INDEX_0) ) unitTarget->RemoveAurasDueToSpell(29659);
+                    if (unitTarget->HasAura(28084, EFFECT_INDEX_0) ) unitTarget->RemoveAurasDueToSpell(28084);
+                    if (unitTarget->HasAura(29660, EFFECT_INDEX_0) ) unitTarget->RemoveAurasDueToSpell(29660);
+
+                    unitTarget->CastSpell(unitTarget, roll_chance_i(50) ? 28059 : 28084, true, 0, 0, m_caster->GetObjectGuid());
+                    break;
                 }
                 case 29200:                                 // Purify Helboar Meat
                 {
