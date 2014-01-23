@@ -1301,6 +1301,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 41466, true, NULL, NULL, m_caster->GetObjectGuid());
                     return;
                 }
+                case 40109:                                 // Knockdown Fel Cannon: The Bolt
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 40075, true);
+                    return;
+                }
                 case 40802:                                 // Mingo's Fortune Generator (Mingo's Fortune Giblets)
                 {
                     // selecting one from Bloodstained Fortune item
