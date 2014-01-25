@@ -1268,6 +1268,7 @@ namespace LuaPlayer
         Unit* victim = sEluna.CHECK_UNIT(L, 2);
         bool pureXP = luaL_optbool(L, 3, true);
         bool triggerHook = luaL_optbool(L, 4, true);
+        bool ReferAFriend = luaL_optbool(L, 5, true);
 
         if (xp < 1)
             return 0;
@@ -1308,7 +1309,7 @@ namespace LuaPlayer
         // XP resting bonus for kill
         uint32 rested_bonus_xp = victim ? player->GetXPRestBonus(xp) : 0;
 
-        player->SendLogXPGain(xp, victim, rested_bonus_xp);
+        player->SendLogXPGain(xp, victim, rested_bonus_xp, ReferAFriend);
 
         uint32 curXP = player->GetUInt32Value(PLAYER_XP);
         uint32 nextLvlXP = player->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
