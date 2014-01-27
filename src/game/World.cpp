@@ -71,6 +71,7 @@
 
 INSTANTIATE_SINGLETON_1(World);
 
+extern bool StartEluna();
 extern void LoadGameObjectModelList();
 
 volatile bool World::m_stopEvent = false;
@@ -1293,7 +1294,7 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize Lua Engine
     sLog.outString("Initialize Eluna Lua Engine...");
-    sEluna.Initialize();
+    StartEluna();
 
     ///- Initialize game time and timers
     sLog.outString("DEBUG:: Initialize game time and timers");
