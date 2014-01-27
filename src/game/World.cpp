@@ -66,7 +66,6 @@
 #include "CharacterDatabaseCleaner.h"
 #include "CreatureLinkingMgr.h"
 #include "WardenDataStorage.h"
-#include "LuaEngine.h"
 #include "HookMgr.h"
 
 INSTANTIATE_SINGLETON_1(World);
