@@ -468,6 +468,7 @@ namespace LuaPlayer
         return 1;
     }
 
+#ifndef CATA
     int ModifyArenaPoints(lua_State* L, Player* player)
     {
         int32 amount = sEluna->CHECKVAL<int32>(L, 2);
@@ -483,6 +484,7 @@ namespace LuaPlayer
         player->ModifyHonorPoints(amount);
         return 0;
     }
+#endif
 
     int GetReputationRank(lua_State* L, Player* player)
     {
@@ -755,7 +757,11 @@ namespace LuaPlayer
 
     int ResetTalentsCost(lua_State* L, Player* player)
     {
+#ifdef CATA
+        sEluna->Push(L, player->GetNextResetTalentsCost());
+#else
         sEluna->Push(L, player->resetTalentsCost());
+#endif
         return 1;
     }
 
@@ -763,7 +769,11 @@ namespace LuaPlayer
     {
         bool no_cost = sEluna->CHECKVAL<bool>(L, 2, true);
 
+#ifdef CATA
+        player->ResetTalents(no_cost);
+#else
         player->resetTalents(no_cost);
+#endif
 #ifndef TBC
         player->SendTalentsInfoData(false);
 #endif
@@ -1500,11 +1510,13 @@ namespace LuaPlayer
         return 1;
     }
 
+#ifndef CATA
     int GetArenaPoints(lua_State* L, Player* player)
     {
         sEluna->Push(L, player->GetArenaPoints());
         return 1;
     }
+#endif
 
     int SetGender(lua_State* L, Player* player)
     {
@@ -1529,11 +1541,13 @@ namespace LuaPlayer
         return 0;
     }
 
+#ifndef CATA
     int GetHonorPoints(lua_State* L, Player* player)
     {
         sEluna->Push(L, player->GetHonorPoints());
         return 1;
     }
+#endif
 
     int GetGossipTextId(lua_State* L, Player* player)
     {
@@ -1620,6 +1634,7 @@ namespace LuaPlayer
         return 1;
     }
 
+#ifndef CATA
     int SetArenaPoints(lua_State* L, Player* player)
     {
         uint32 arenaP = sEluna->CHECKVAL<uint32>(L, 2);
@@ -1633,6 +1648,7 @@ namespace LuaPlayer
         player->SetHonorPoints(honorP);
         return 0;
     }
+#endif
 
     int SetLifetimeKills(lua_State* L, Player* player)
     {
@@ -2167,11 +2183,13 @@ namespace LuaPlayer
         return 1;
     }
 
+#ifndef CATA
     int GetShieldBlockValue(lua_State* L, Player* player)
     {
         sEluna->Push(L, player->GetShieldBlockValue());
         return 1;
     }
+#endif
 
     int IsInWater(lua_State* L, Player* player)
     {
@@ -2207,6 +2225,24 @@ namespace LuaPlayer
         return 1;
     }
 
+#ifdef WOTLK
+    int GetPhaseMaskForSpawn(lua_State* L, Player* player)
+    {
+        sEluna->Push(L, player->GetPhaseMaskForSpawn());
+        return 1;
+    }
+
+    int SendMailMenu(lua_State* L, Player* player)
+    {
+        GameObject* object = sEluna->CHECKOBJ<GameObject>(L, 2);
+
+        WorldPacket data(SMSG_SHOW_MAILBOX, 8);
+        data << uint64(object->GetGUIDLow());
+        player->GetSession()->HandleGetMailList(data);
+        return 0;
+    }
+#endif
+
 #ifndef TBC
     int HasTalent(lua_State* L, Player* player)
     {
@@ -2216,12 +2252,6 @@ namespace LuaPlayer
             sEluna->Push(L, false);
         else
             sEluna->Push(L, player->HasTalent(talentId, spec));
-        return 1;
-    }
-
-    int GetPhaseMaskForSpawn(lua_State* L, Player* player)
-    {
-        sEluna->Push(L, player->GetPhaseMaskForSpawn());
         return 1;
     }
 
@@ -2277,16 +2307,6 @@ namespace LuaPlayer
         sEluna->Push(L, player->HasAchieved(achievementId));
 #endif
         return 1;
-    }
-
-    int SendMailMenu(lua_State* L, Player* player)
-    {
-        GameObject* object = sEluna->CHECKOBJ<GameObject>(L, 2);
-
-        WorldPacket data(SMSG_SHOW_MAILBOX, 8);
-        data << uint64(object->GetGUIDLow());
-        player->GetSession()->HandleGetMailList(data);
-        return 0;
     }
 #endif
 };
