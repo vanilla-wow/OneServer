@@ -5518,6 +5518,9 @@ uint32 Spell::CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spel
     if (castItem)
         return 0;
 
+    if (spell->m_IsTriggeredSpell && spellInfo->SpellIconID == 565 && spellInfo->SpellVisual == 406)
+        return 0; // Sunder armor triggered by Devastate
+
     // Spell drain all exist power on cast (Only paladin lay of Hands)
     if (spellInfo->HasAttribute(SPELL_ATTR_EX_DRAIN_ALL_POWER))
     {
