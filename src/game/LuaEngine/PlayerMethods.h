@@ -2225,6 +2225,7 @@ namespace LuaPlayer
         return 1;
     }
 
+#ifdef MANGOS
     int SetFFA(lua_State* L, Player* player)
     {
         bool apply = sEluna->CHECKVAL<bool>(L, 2, true);
@@ -2232,6 +2233,7 @@ namespace LuaPlayer
         player->SetFFAPvP(apply);
         return 0;
     }
+#endif
 
 #ifdef WOTLK
     int GetPhaseMaskForSpawn(lua_State* L, Player* player)
