@@ -50,8 +50,8 @@ To be able to accomplish these goals, we support and promote:
   You can find further information about CoronaCore at the following places:
   * [GitHub repositories](https://github.com/CoronaCore/)
   * [Issue tracker](https://github.com/CoronaCore/Issues/issues)
-  * [Pull Requests](https://github.com/CoronaCore/Server/pulls)
-  * [Current build status on Travis CI](https://travis-ci.org/CoronaCore/Server/)
+  * [Pull Requests](https://github.com/CoronaCore/OneServer/pulls)
+  * [Current build status on Travis CI](https://travis-ci.org/CoronaCore/OneServer/)
   * [Wiki](https://github.com/CoronaCore/Issues/wiki) with additional information on installation
   * [Contributing Guidelines](CONTRIBUTING.md)
   * Documentation can be found in the doc/ subdirectory and on the github wiki
@@ -103,5 +103,5 @@ To be able to accomplish these goals, we support and promote:
   so, delete this exception statement from your version.
 
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/CoronaCore/Server/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/CoronaCore/OneServer/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
