@@ -2146,9 +2146,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool HasTitle(CharTitlesEntry const* title) const { return HasTitle(title->bit_index); }
         void SetTitle(CharTitlesEntry const* title, bool lost = false);
 
-        uint32 GetChampioningFaction() const { return m_ChampioningFaction; }
-        void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
-
         // Playerbot mod:
         // A Player can either have a playerbotMgr (to manage its bots), or have playerbotAI (if it is a bot), or
         // neither. Code that enables bots must create the playerbotMgr and set it using SetPlayerbotMgr.
@@ -2278,8 +2275,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         PlayerMails m_mail;
         PlayerSpellMap m_spells;
         SpellCooldowns m_spellCooldowns;
-
-        uint32 m_ChampioningFaction;
 
         GlobalCooldownMgr m_GlobalCooldownMgr;
 
