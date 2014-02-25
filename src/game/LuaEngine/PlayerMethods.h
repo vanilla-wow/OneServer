@@ -1183,7 +1183,7 @@ namespace LuaPlayer
         Unit* victim = sEluna->CHECKOBJ<Unit>(L, 3, false);
         bool pureXP = sEluna->CHECKVAL<bool>(L, 4, true);
         bool triggerHook = sEluna->CHECKVAL<bool>(L, 5, true);
-        bool ReferAFriend = sEluna.CHECKVAL<bool>(L, 6, true);
+        bool ReferAFriend = sEluna->CHECKVAL<bool>(L, 6, true);
 
 #ifdef MANGOS
         if (xp < 1)
@@ -1228,9 +1228,11 @@ namespace LuaPlayer
 
         // XP resting bonus for kill
         uint32 rested_bonus_xp = victim ? player->GetXPRestBonus(xp) : 0;
-
+#ifndef TBC
+        player->SendLogXPGain(xp, victim, rested_bonus_xp);
+#else
         player->SendLogXPGain(xp, victim, rested_bonus_xp, ReferAFriend);
-
+#endif
         uint32 curXP = player->GetUInt32Value(PLAYER_XP);
         uint32 nextLvlXP = player->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
         uint32 newXP = curXP + xp + rested_bonus_xp;
