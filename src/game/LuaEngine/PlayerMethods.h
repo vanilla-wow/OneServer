@@ -1685,10 +1685,8 @@ namespace LuaPlayer
         if (!player->isAlive())
             return 0;
 
-#ifndef TBC
         if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_XP_USER_DISABLED))
             return 0;
-#endif
 
         uint32 level = player->getLevel();
 
