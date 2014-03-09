@@ -111,10 +111,7 @@ WorldSession::~WorldSession()
     }
 
     if (m_Warden)
-    {
         delete m_Warden;
-        m_Warden = NULL;
-    }
 
     ///- empty incoming packet queue
     WorldPacket* packet = NULL;
