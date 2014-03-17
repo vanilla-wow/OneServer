@@ -4283,6 +4283,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
             }
         }
     }
+    sHookMgr.OnResurrect(this);
 }
 
 void Player::KillPlayer()
