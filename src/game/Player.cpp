@@ -4248,6 +4248,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // update visibility of player for nearby cameras
     UpdateObjectVisibility();
 
+    sHookMgr->OnResurrect(this);
+
     if (!applySickness)
         return;
 
@@ -4274,7 +4276,6 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
             }
         }
     }
-    sHookMgr->OnResurrect(this);
 }
 
 void Player::KillPlayer()
