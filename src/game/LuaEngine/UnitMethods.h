@@ -555,7 +555,7 @@ namespace LuaUnit
 
     Powers PowerSelectorHelper(lua_State* L, Unit* unit, int powerType = -1)
     {
-#if (!defined(TRINITY) && defined(WOTLK))
+#if (!defined(TRINITY) && defined(WOTLK) && defined(TBC))
         if (powerType == -1)
             return unit->GetPowerType();
 #else
@@ -592,7 +592,7 @@ namespace LuaUnit
         int type = Eluna::CHECKVAL<int>(L, 2, -1);
         Powers power = PowerSelectorHelper(L, unit, type);
 
-#if (!defined(TRINITY) && defined(WOTLK))
+#if (!defined(TRINITY) && defined(WOTLK) && defined(TBC))
         float percent = ((float)unit->GetPower(power) / (float)unit->GetMaxPower(power)) * 100.0f;
 #else
         float percent = ((float)unit->GetPower(power) / (float)unit->GetMaxPower(power)) * 100.0f;
@@ -603,7 +603,7 @@ namespace LuaUnit
 
     int GetPowerType(lua_State* L, Unit* unit)
     {
-#if (!defined(TRINITY) && defined(WOTLK))
+#if (!defined(TRINITY) && defined(WOTLK) && defined(TBC))
         Eluna::Push(L, unit->GetPowerType());
 #else
         Eluna::Push(L, unit->getPowerType());
