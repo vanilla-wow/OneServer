@@ -555,12 +555,27 @@ namespace LuaUnit
 
     Powers PowerSelectorHelper(lua_State* L, Unit* unit, int powerType = -1)
     {
-#if (!defined(TRINITY) && defined(WOTLK) && defined(TBC))
+#ifdef TRINITY
+        if (powerType == -1)
+            return unit->getPowerType();
+#endif
+#ifdef MANGOS
+#if (defined(WOTLK))
         if (powerType == -1)
             return unit->GetPowerType();
 #else
         if (powerType == -1)
             return unit->getPowerType();
+#endif
+#endif
+#ifdef CMANGOS
+#if (defined(WOTLK) || defined(TBC))
+        if (powerType == -1)
+            return unit->GetPowerType();
+#else
+        if (powerType == -1)
+            return unit->getPowerType();
+#endif
 #endif
 
         if (powerType < 0 || powerType >= int(MAX_POWERS))
@@ -592,7 +607,7 @@ namespace LuaUnit
         int type = Eluna::CHECKVAL<int>(L, 2, -1);
         Powers power = PowerSelectorHelper(L, unit, type);
 
-#if (!defined(TRINITY) && defined(WOTLK) && defined(TBC))
+#if (!defined(TRINITY) && defined(WOTLK))
         float percent = ((float)unit->GetPower(power) / (float)unit->GetMaxPower(power)) * 100.0f;
 #else
         float percent = ((float)unit->GetPower(power) / (float)unit->GetMaxPower(power)) * 100.0f;
@@ -603,10 +618,22 @@ namespace LuaUnit
 
     int GetPowerType(lua_State* L, Unit* unit)
     {
-#if (!defined(TRINITY) && defined(WOTLK) && defined(TBC))
+#ifdef TRINITY
+        Eluna::Push(L, unit->getPowerType());
+#endif
+#ifdef MANGOS
+#if (defined(WOTLK))
         Eluna::Push(L, unit->GetPowerType());
 #else
         Eluna::Push(L, unit->getPowerType());
+#endif
+#endif
+#ifdef CMANGOS
+#if (defined(WOTLK) || defined(TBC))
+        Eluna::Push(L, unit->GetPowerType());
+#else
+        Eluna::Push(L, unit->getPowerType());
+#endif
 #endif
         return 1;
     }
@@ -919,10 +946,23 @@ namespace LuaUnit
         uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
         if (type >= int(MAX_POWERS))
             return luaL_argerror(L, 2, "valid Powers expected");
-#if (!defined(TRINITY) && defined(WOTLK))
+
+#ifdef TRINITY
+        unit->setPowerType((Powers)type);
+#endif
+#ifdef MANGOS
+#if (defined(WOTLK))
         unit->SetPowerType((Powers)type);
 #else
         unit->setPowerType((Powers)type);
+#endif
+#endif
+#ifdef CMANGOS
+#if (defined(WOTLK) || defined(TBC))
+        unit->SetPowerType((Powers)type);
+#else
+        unit->setPowerType((Powers)type);
+#endif
 #endif
         return 0;
     }

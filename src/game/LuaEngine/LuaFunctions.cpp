@@ -102,7 +102,7 @@ void RegisterGlobals(lua_State* L)
     lua_register(L, "VendorRemoveItem", &LuaGlobalFunctions::VendorRemoveItem);                             // VendorRemoveItem(entry, item) - Removes an item from vendor entry
     lua_register(L, "VendorRemoveAllItems", &LuaGlobalFunctions::VendorRemoveAllItems);                     // VendorRemoveAllItems(entry) - Removes all items from vendor entry
     lua_register(L, "Kick", &LuaGlobalFunctions::Kick);                                                     // Kick(player) - Kicks given player
-    lua_register(L, "Ban", &LuaGlobalFunctions::Ban);                                                       // Ban(banMode(integer), nameOrIP(string), duration(string), reason(string), player(whoBanned)) - Banmode: 0 account, 1 character, 2 IP
+    lua_register(L, "Ban", &LuaGlobalFunctions::Ban);                                                       // Ban(banMode(integer), nameOrIP(string), duration(string), reason(string), whoBanned(string)) - Banmode: 0 account, 1 character, 2 IP
     lua_register(L, "SaveAllPlayers", &LuaGlobalFunctions::SaveAllPlayers);                                 // SaveAllPlayers() - Saves all players
     lua_register(L, "SendMail", &LuaGlobalFunctions::SendMail);                                             // SendMail(subject, text, receiverLowGUID[, senderLowGUID, stationary, delay, itemEntry, itemAmount, itemEntry2, itemAmount2...]) - Sends a mail to player with lowguid. use nil to use default values on optional arguments. UNDOCUMENTED
     lua_register(L, "AddTaxiPath", &LuaGlobalFunctions::AddTaxiPath);                                       // AddTaxiPath(pathTable, mountA, mountH[, price, pathId]) - Adds a new taxi path. Returns the path's ID. Will replace an existing path if pathId provided and already used. mountIDs are NPC entries. path table structure: T = {{map, x, y, z[, actionFlag, delay, arrivalEvId, departEvId]}, {...}, ...}
@@ -904,23 +904,22 @@ ElunaRegister<Item> ItemMethods[] =
 ElunaRegister<Aura> AuraMethods[] =
 {
     // Getters
-    { "GetCaster", &LuaAura::GetCaster },                 // :GetCaster() - Returns caster as object
-    { "GetCasterGUID", &LuaAura::GetCasterGUID },         // :GetCasterGUID() - Returns caster as GUID
-    { "GetCasterLevel", &LuaAura::GetCasterLevel },       // :GetCasterLevel() - Returns casters level
-    { "GetDuration", &LuaAura::GetDuration },             // :GetDuration() - Returns remaining duration
-    { "GetMaxDuration", &LuaAura::GetMaxDuration },       // :GetMaxDuration() - Returns maximum duration
-    { "GetCharges", &LuaAura::GetCharges },               // :GetCharges() - Returns remaining charges
-    { "GetAuraId", &LuaAura::GetAuraId },                 // :GetAuraId() - Returns aura ID
-    { "GetStackAmount", &LuaAura::GetStackAmount },       // :GetStackAmount() - Returns current stack amount
-    { "GetOwner", &LuaAura::GetOwner },                   // :GetOwner() - Gets the unit wearing the aura
+    { "GetCaster", &LuaAura::GetCaster },
+    { "GetCasterGUID", &LuaAura::GetCasterGUID },
+    { "GetCasterLevel", &LuaAura::GetCasterLevel },
+    { "GetDuration", &LuaAura::GetDuration },
+    { "GetMaxDuration", &LuaAura::GetMaxDuration },
+    { "GetAuraId", &LuaAura::GetAuraId },
+    { "GetStackAmount", &LuaAura::GetStackAmount },
+    { "GetOwner", &LuaAura::GetOwner },
 
     // Setters
-    { "SetDuration", &LuaAura::SetDuration },             // :SetDuration(duration) - Sets remaining duration
-    { "SetMaxDuration", &LuaAura::SetMaxDuration },       // :SetMaxDuration(duration) - Sets maximum duration
-    { "SetStackAmount", &LuaAura::SetStackAmount },       // :SetStackAmount(amount) - Sets current stack amount
+    { "SetDuration", &LuaAura::SetDuration },
+    { "SetMaxDuration", &LuaAura::SetMaxDuration },
+    { "SetStackAmount", &LuaAura::SetStackAmount },
 
     // Other
-    { "Remove", &LuaAura::Remove },                       // :Remove() - Removes the aura
+    { "Remove", &LuaAura::Remove },
 
     { NULL, NULL },
 };
