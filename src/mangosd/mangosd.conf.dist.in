@@ -1650,9 +1650,9 @@ CharDelete.KeepDays = 30
 # ELUNA SETTINGS
 #
 #    Eluna.Enabled
-#        Enable Enabled Eluna LuaEngine
-#        Default: 0 (Disabled)
-#                 1 (Enabled)
+#        Enable Eluna LuaEngine
+#        Default: 1 (Enabled)
+#                 0 (Disabled)
 #
 #    Eluna.ScriptPath
 #        Default: "lua_scripts"
@@ -1660,4 +1660,4 @@ CharDelete.KeepDays = 30
 ###################################################################################################################
 
 Eluna.Enabled = 0
-Eluna.ScriptPath = ""
+Eluna.ScriptPath = "lua_scripts"
