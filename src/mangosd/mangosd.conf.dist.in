@@ -1709,5 +1709,5 @@ Warden.ClientCheckHoldOff   = 15
 #
 ###################################################################################################################
 
-Eluna.Enabled = 0
+Eluna.Enabled = 1
 Eluna.ScriptPath = "lua_scripts"
