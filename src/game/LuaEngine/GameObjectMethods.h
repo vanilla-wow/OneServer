@@ -10,7 +10,7 @@
 namespace LuaGameObject
 {
     /**
-     * Returns 'true' if the &GameObject has the specified quest
+     * Returns 'true' if the [GameObject] can give the specified [Quest]
      *
      * @param uint32 questId : quest entry Id to check
      * @return bool hasQuest
@@ -28,7 +28,7 @@ namespace LuaGameObject
     }
 
     /**
-     * Returns 'true' if the &GameObject is spawned
+     * Returns 'true' if the [GameObject] is spawned
      *
      * @return bool isSpawned
      */
@@ -39,7 +39,7 @@ namespace LuaGameObject
     }
 
     /**
-     * Returns 'true' if the &GameObject is a transport
+     * Returns 'true' if the [GameObject] is a transport
      *
      * @return bool isTransport
      */
@@ -50,9 +50,9 @@ namespace LuaGameObject
     }
 
     /**
-     * Returns 'true' if the &GameObject is active
+     * Returns 'true' if the [GameObject] is active
      *
-     * @return bool isActiveObject
+     * @return bool isActive
      */
     int IsActive(lua_State* L, GameObject* go)
     {
@@ -67,7 +67,7 @@ namespace LuaGameObject
     }*/
 
     /**
-     * Returns display Id of the &GameObject
+     * Returns display ID of the [GameObject]
      *
      * @return uint32 displayId
      */
@@ -78,8 +78,8 @@ namespace LuaGameObject
     }
 
     /**
-     * Returns the state of a &GameObject
-     * Below are client side GOStates off of 3.3.5a
+     * Returns the state of a [GameObject]
+     * Below are client side [GOState]s off of 3.3.5a
      *
      * <pre>
      * enum GOState
@@ -87,10 +87,10 @@ namespace LuaGameObject
      *     GO_STATE_ACTIVE             = 0,                        // show in world as used and not reset (closed door open)
      *     GO_STATE_READY              = 1,                        // show in world as ready (closed door close)
      *     GO_STATE_ACTIVE_ALTERNATIVE = 2                         // show in world as used in alt way and not reset (closed door open by cannon fire)
-     *  };
+     * };
      * </pre>
      *
-     * @return uint32 goState
+     * @return [GOState] goState
      */
     int GetGoState(lua_State* L, GameObject* go)
     {
@@ -99,8 +99,8 @@ namespace LuaGameObject
     }
 
     /**
-     * Returns the loot state of a &GameObject
-     * Below are Loot States off of 3.3.5a
+     * Returns the [LootState] of a [GameObject]
+     * Below are [LootState]s off of 3.3.5a
      *
      * <pre>
      * enum LootState
@@ -112,7 +112,7 @@ namespace LuaGameObject
      * };
      * </pre>
      *
-     * @return uint32 lootState
+     * @return [LootState] lootState
      */
     int GetLootState(lua_State* L, GameObject* go)
     {
@@ -121,7 +121,7 @@ namespace LuaGameObject
     }
 
     /**
-     * Sets the state of a &GameObject
+     * Sets the state of a [GameObject]
      *
      * <pre>
      * enum GOState
@@ -129,10 +129,10 @@ namespace LuaGameObject
      *     GO_STATE_ACTIVE             = 0,                        // show in world as used and not reset (closed door open)
      *     GO_STATE_READY              = 1,                        // show in world as ready (closed door close)
      *     GO_STATE_ACTIVE_ALTERNATIVE = 2                         // show in world as used in alt way and not reset (closed door open by cannon fire)
-     *  };
+     * };
      * </pre>
      *
-     * @param uint32 state : all available go states can be seen above
+     * @param [GOState] state : all available go states can be seen above
      */
     int SetGoState(lua_State* L, GameObject* go)
     {
@@ -149,8 +149,8 @@ namespace LuaGameObject
     }
 
     /**
-     * Sets the loot state of a &GameObject
-     * Below are Loot States off of 3.3.5a
+     * Sets the [LootState] of a [GameObject]
+     * Below are [LootState]s off of 3.3.5a
      *
      * <pre>
      * enum LootState
@@ -162,7 +162,7 @@ namespace LuaGameObject
      * };
      * </pre>
      *
-     * @param uint32 state : all available loot states can be seen above
+     * @param [LootState] state : all available loot states can be seen above
      */
     int SetLootState(lua_State* L, GameObject* go)
     {
@@ -181,7 +181,7 @@ namespace LuaGameObject
     }
 
     /**
-     * Saves &GameObject to the database
+     * Saves [GameObject] to the database
      *
      */
     int SaveToDB(lua_State* /*L*/, GameObject* go)
@@ -191,9 +191,9 @@ namespace LuaGameObject
     }
 
     /**
-     * Removes &GameObject from the world
+     * Removes [GameObject] from the world
      *
-     * @param bool deleteFromDB : if true, it will delete the go from the database
+     * @param bool deleteFromDB : if true, it will delete the [GameObject] from the database
      */
     int RemoveFromWorld(lua_State* L, GameObject* go)
     {
@@ -205,12 +205,12 @@ namespace LuaGameObject
     }
 
     /**
-     * Registers a event to the &GameObject
+     * Registers a timed event to the [GameObject]
      *
-     * @param function function : function to register the event with
+     * @param function function : function to trigger when the time has passed
      * @param uint32 delay : set time in milliseconds for the event to trigger
      * @param uint32 repeats : how many times for the event to repeat, 0 is infinite
-     * @return int32 functionReference
+     * @return int32 eventId : unique ID for the timed event used to cancel it
      */
     int RegisterEvent(lua_State* L, GameObject* go)
     {
@@ -227,7 +227,7 @@ namespace LuaGameObject
     }
 
     /**
-     * Removes event from a &GameObject by the specified event Id
+     * Removes the timed event from a [GameObject] by the specified event ID
      *
      * @param int32 eventId : event Id to remove
      */
@@ -239,7 +239,7 @@ namespace LuaGameObject
     }
 
     /**
-     * Removes all events from a &GameObject
+     * Removes all timed events from a [GameObject]
      *
      */
     int RemoveEvents(lua_State* /*L*/, GameObject* go)
@@ -249,9 +249,9 @@ namespace LuaGameObject
     }
 
     /**
-     * Changes the state of a &GameObject to a door or button
+     * Changes uses a door or a button type [GameObject]
      *
-     * @param uint32 delay : cooldown time to restore the go
+     * @param uint32 delay : cooldown time in seconds to restore the [GameObject] back to normal
      */
     int UseDoorOrButton(lua_State* L, GameObject* go)
     {
@@ -262,9 +262,9 @@ namespace LuaGameObject
     }
 
     /**
-     * Despawns a &GameObject
+     * Despawns a [GameObject]
      *
-     * @param uint32 delay : time of despawn
+     * @param uint32 delay : time in seconds to despawn
      */
     int Despawn(lua_State* L, GameObject* go)
     {
@@ -278,9 +278,9 @@ namespace LuaGameObject
     }
 
     /**
-     * Respawns a &GameObject
+     * Respawns a [GameObject]
      *
-     * @param uint32 delay : time of respawn
+     * @param uint32 delay : time of respawn in seconds
      */
     int Respawn(lua_State* L, GameObject* go)
     {
