@@ -14008,14 +14008,6 @@ void Player::SendQuestReward(Quest const* pQuest, uint32 XP, Object* questGiver)
             data << uint32(0) << uint32(0);
     }
     GetSession()->SendPacket(&data);
-
-    // used by eluna
-    if (Creature* pCreature = questGiver->ToCreature())
-        sEluna->OnQuestComplete(pPlayer, pCreature, pQuest);
-
-    // used by eluna
-    if (GameObject* pGameObject = questGiver->ToGameObject())
-        sEluna->OnQuestComplete(pPlayer, pGameObject, pQuest);
 }
 
 void Player::SendQuestFailed(uint32 quest_id)
