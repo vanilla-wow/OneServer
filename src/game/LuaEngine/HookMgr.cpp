@@ -116,6 +116,13 @@ void Eluna::OnLuaStateClose()
     ENDCALL();
 }
 
+void Eluna::OnLuaStateOpen()
+{
+    EVENT_BEGIN(ServerEventBindings, ELUNA_EVENT_ON_LUA_STATE_OPEN, return);
+    EVENT_EXECUTE(0);
+    ENDCALL();
+}
+
 // areatrigger
 bool Eluna::OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pTrigger)
 {
@@ -334,13 +341,14 @@ void Eluna::OnShutdownCancel()
 
 void Eluna::OnWorldUpdate(uint32 diff)
 {
+    eventMgr->globalProcessor->Update(diff);
+
     if (reload)
     {
         ReloadEluna();
         return;
     }
 
-    m_EventMgr->Update(diff);
     EVENT_BEGIN(ServerEventBindings, WORLD_EVENT_ON_UPDATE, return);
     Push(L, diff);
     EVENT_EXECUTE(0);
@@ -1395,16 +1403,16 @@ bool Eluna::OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* pQu
     return true;
 }
 
-bool Eluna::OnQuestComplete(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    ENTRY_BEGIN(CreatureEventBindings, pCreature->GetEntry(), CREATURE_EVENT_ON_QUEST_COMPLETE, return false);
-    Push(L, pPlayer);
-    Push(L, pCreature);
-    Push(L, pQuest);
-    ENTRY_EXECUTE(0);
-    ENDCALL();
-    return true;
-}
+//bool Eluna::OnQuestComplete(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
+//{
+//    ENTRY_BEGIN(CreatureEventBindings, pCreature->GetEntry(), CREATURE_EVENT_ON_QUEST_COMPLETE, return false);
+//    Push(L, pPlayer);
+//    Push(L, pCreature);
+//    Push(L, pQuest);
+//    ENTRY_EXECUTE(0);
+//    ENDCALL();
+//    return true;
+//}
 
 bool Eluna::OnQuestReward(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
@@ -1471,11 +1479,11 @@ struct ElunaCreatureAI : ScriptedAI
     void UpdateAI(uint32 diff) override
 #endif
     {
-#ifndef TRINITY
-        if (IsCombatMovement())
+#ifdef TRINITY
+        if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
             ScriptedAI::UpdateAI(diff);
 #else
-        if (!me->HasReactState(REACT_PASSIVE))
+        if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE))
             ScriptedAI::UpdateAI(diff);
 #endif
         ENTRY_BEGIN(CreatureEventBindings, me->GetEntry(), CREATURE_EVENT_ON_AIUPDATE, return);
@@ -1814,19 +1822,20 @@ bool Eluna::OnQuestAccept(Player* pPlayer, GameObject* pGameObject, Quest const*
     return true;
 }
 
-bool Eluna::OnQuestComplete(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest)
-{
-    ENTRY_BEGIN(GameObjectEventBindings, pGameObject->GetEntry(), GAMEOBJECT_EVENT_ON_QUEST_COMPLETE, return false);
-    Push(L, pPlayer);
-    Push(L, pGameObject);
-    Push(L, pQuest);
-    ENTRY_EXECUTE(0);
-    ENDCALL();
-    return true;
-}
+//bool Eluna::OnQuestComplete(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest)
+//{
+//    ENTRY_BEGIN(GameObjectEventBindings, pGameObject->GetEntry(), GAMEOBJECT_EVENT_ON_QUEST_COMPLETE, return false);
+//    Push(L, pPlayer);
+//    Push(L, pGameObject);
+//    Push(L, pQuest);
+//    ENTRY_EXECUTE(0);
+//    ENDCALL();
+//    return true;
+//}
 
 void Eluna::UpdateAI(GameObject* pGameObject, uint32 diff)
 {
+    pGameObject->elunaEvents->Update(diff);
     ENTRY_BEGIN(GameObjectEventBindings, pGameObject->GetEntry(), GAMEOBJECT_EVENT_ON_AIUPDATE, return);
     Push(L, pGameObject);
     Push(L, diff);
@@ -1924,4 +1933,45 @@ CreatureAI* Eluna::GetAI(Creature* creature)
     if (!CreatureEventBindings->GetBindMap(creature->GetEntry()))
         return NULL;
     return new ElunaCreatureAI(creature);
+}
+
+void Eluna::OnBGStart(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId)
+{
+    EVENT_BEGIN(BGEventBindings, BG_EVENT_ON_START, return);
+    Push(L, bg);
+    Push(L, bgId);
+    Push(L, instanceId);
+    EVENT_EXECUTE(0);
+    ENDCALL();
+}
+
+void Eluna::OnBGEnd(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId, Team winner)
+{
+    EVENT_BEGIN(BGEventBindings, BG_EVENT_ON_END, return);
+    Push(L, bg);
+    Push(L, bgId);
+    Push(L, instanceId);
+    Push(L, winner);
+    EVENT_EXECUTE(0);
+    ENDCALL();
+}
+
+void Eluna::OnBGCreate(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId)
+{
+    EVENT_BEGIN(BGEventBindings, BG_EVENT_ON_CREATE, return);
+    Push(L, bg);
+    Push(L, bgId);
+    Push(L, instanceId);
+    EVENT_EXECUTE(0);
+    ENDCALL();
+}
+
+void Eluna::OnBGDestroy(BattleGround* bg, BattleGroundTypeId bgId, uint32 instanceId)
+{
+    EVENT_BEGIN(BGEventBindings, BG_EVENT_ON_PRE_DESTROY, return);
+    Push(L, bg);
+    Push(L, bgId);
+    Push(L, instanceId);
+    EVENT_EXECUTE(0);
+    ENDCALL();
 }

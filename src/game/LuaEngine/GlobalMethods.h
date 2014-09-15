@@ -152,9 +152,9 @@ namespace LuaGlobalFunctions
             if (Player* player = it->second->GetPlayer())
             {
 #ifndef TRINITY
-                if (player->GetSession() && ((team >= TEAM_NEUTRAL || player->GetTeamId() == team) && (!onlyGM || player->isGameMaster())))
+                if ((team == TEAM_NEUTRAL || player->GetTeamId() == team) && (!onlyGM || player->isGameMaster()))
 #else
-                if (player->GetSession() && ((team >= TEAM_NEUTRAL || player->GetTeamId() == team) && (!onlyGM || player->IsGameMaster())))
+                if ((team == TEAM_NEUTRAL || player->GetTeamId() == team) && (!onlyGM || player->IsGameMaster()))
 #endif
                 {
                     ++i;
@@ -601,6 +601,17 @@ namespace LuaGlobalFunctions
         return 0;
     }
 
+    int RegisterBGEvent(lua_State* L)
+    {
+        uint32 ev = Eluna::CHECKVAL<uint32>(L, 1);
+        luaL_checktype(L, 2, LUA_TFUNCTION);
+        lua_pushvalue(L, 2);
+        int functionRef = luaL_ref(L, LUA_REGISTRYINDEX);
+        if (functionRef > 0)
+            sEluna->Register(HookMgr::REGTYPE_BG, 0, ev, functionRef);
+        return 0;
+    }
+
     int ReloadEluna(lua_State* /*L*/)
     {
         Eluna::reload = true;
@@ -618,19 +629,20 @@ namespace LuaGlobalFunctions
     {
         const char* query = Eluna::CHECKVAL<const char*>(L, 1);
 
-        QueryResult* result = NULL;
-#ifndef TRINITY
-        result = WorldDatabase.Query(query);
+#ifdef TRINITY
+		ElunaQuery result = WorldDatabase.Query(query);
+		if (result)
+			Eluna::Push(L, new ElunaQuery(result));
+		else
+			Eluna::Push(L);
 #else
-        QueryResult res = WorldDatabase.Query(query);
-        if (res)
-            result = new QueryResult(res);
+		ElunaQuery* result = WorldDatabase.QueryNamed(query);
+		if (result)
+			Eluna::Push(L, result);
+		else
+			Eluna::Push(L);
 #endif
-        if (result)
-            Eluna::Push(L, result);
-        else
-            Eluna::Push(L);
-        return 1;
+		return 1;
     }
 
     int WorldDBExecute(lua_State* L)
@@ -644,19 +656,20 @@ namespace LuaGlobalFunctions
     {
         const char* query = Eluna::CHECKVAL<const char*>(L, 1);
 
-        QueryResult* result = NULL;
-#ifndef TRINITY
-        result = CharacterDatabase.Query(query);
+#ifdef TRINITY
+		QueryResult result = CharacterDatabase.Query(query);
+		if (result)
+			Eluna::Push(L, new QueryResult(result));
+		else
+			Eluna::Push(L);
 #else
-        QueryResult res = CharacterDatabase.Query(query);
-        if (res)
-            result = new QueryResult(res);
+		QueryNamedResult* result = CharacterDatabase.QueryNamed(query);
+		if (result)
+			Eluna::Push(L, result);
+		else
+			Eluna::Push(L);
 #endif
-        if (result)
-            Eluna::Push(L, result);
-        else
-            Eluna::Push(L);
-        return 1;
+		return 1;
     }
 
     int CharDBExecute(lua_State* L)
@@ -668,20 +681,21 @@ namespace LuaGlobalFunctions
 
     int AuthDBQuery(lua_State* L)
     {
-        const char* query = Eluna::CHECKVAL<const char*>(L, 1);
+		const char* query = Eluna::CHECKVAL<const char*>(L, 1);
 
-        QueryResult* result = NULL;
-#ifndef TRINITY
-        result = LoginDatabase.Query(query);
+#ifdef TRINITY
+		QueryResult result = LoginDatabase.Query(query);
+		if (result)
+			Eluna::Push(L, new QueryResult(result));
+		else
+			Eluna::Push(L);
 #else
-        QueryResult res = LoginDatabase.Query(query);
-        if (res)
-            result = new QueryResult(res);
+		QueryNamedResult* result = LoginDatabase.QueryNamed(query);
+		if (result)
+			Eluna::Push(L, result);
+		else
+			Eluna::Push(L);
 #endif
-        if (result)
-            Eluna::Push(L, result);
-        else
-            Eluna::Push(L);
         return 1;
     }
 
@@ -692,6 +706,16 @@ namespace LuaGlobalFunctions
         return 0;
     }
 
+    /**
+     * Registers a global timed event
+     * When the passed function is called, the parameters `(eventId, delay, repeats)` are passed to it.
+     * Repeats will decrease on each call if the event does not repeat indefinitely
+     *
+     * @param function function : function to trigger when the time has passed
+     * @param uint32 delay : set time in milliseconds for the event to trigger
+     * @param uint32 repeats : how many times for the event to repeat, 0 is infinite
+     * @return int eventId : unique ID for the timed event used to cancel it or nil
+     */
     int CreateLuaEvent(lua_State* L)
     {
         luaL_checktype(L, 1, LUA_TFUNCTION);
@@ -700,34 +724,47 @@ namespace LuaGlobalFunctions
 
         lua_pushvalue(L, 1);
         int functionRef = luaL_ref(L, LUA_REGISTRYINDEX);
-        functionRef = sEluna->m_EventMgr->AddEvent(&sEluna->m_EventMgr->GlobalEvents, functionRef, delay, repeats);
-        if (functionRef)
+        if (functionRef != LUA_REFNIL && functionRef != LUA_NOREF)
+        {
+            sEluna->eventMgr->globalProcessor->AddEvent(functionRef, delay, repeats);
             Eluna::Push(L, functionRef);
-        else
-            Eluna::Push(L);
+        }
         return 1;
     }
 
+    /**
+     * Removes a global timed event specified by the event ID
+     *
+     * @param int eventId : event Id to remove
+     * @param bool all_Events = false : remove from all events, not just global
+     */
     int RemoveEventById(lua_State* L)
     {
         int eventId = Eluna::CHECKVAL<int>(L, 1);
         bool all_Events = Eluna::CHECKVAL<bool>(L, 1, false);
 
+        // not thread safe
         if (all_Events)
-            sEluna->m_EventMgr->RemoveEvent(eventId);
+            sEluna->eventMgr->RemoveEvent(eventId);
         else
-            sEluna->m_EventMgr->RemoveEvent(&sEluna->m_EventMgr->GlobalEvents, eventId);
+            sEluna->eventMgr->globalProcessor->RemoveEvent(eventId);
         return 0;
     }
 
+    /**
+     * Removes all global timed events
+     *
+     * @param bool all_Events = false : remove all events, not just global
+     */
     int RemoveEvents(lua_State* L)
     {
         bool all_Events = Eluna::CHECKVAL<bool>(L, 1, false);
 
+        // not thread safe
         if (all_Events)
-            sEluna->m_EventMgr->RemoveEvents();
+            sEluna->eventMgr->RemoveEvents();
         else
-            sEluna->m_EventMgr->GlobalEvents.KillAllEvents(true);
+            sEluna->eventMgr->globalProcessor->RemoveEvents();
         return 0;
     }
 
@@ -1153,25 +1190,25 @@ namespace LuaGlobalFunctions
 
         switch (banMode)
         {
-        case BAN_ACCOUNT:
+            case BAN_ACCOUNT:
 #ifdef CATA
-            if (!Utf8ToUpperOnlyLatin(nameOrIP))
-                return 0;
+                if (!Utf8ToUpperOnlyLatin(nameOrIP))
+                    return 0;
 #else
-            if (!AccountMgr::normalizeString(nameOrIP))
-                return 0;
+                if (!AccountMgr::normalizeString(nameOrIP))
+                    return 0;
 #endif
-            break;
-        case BAN_CHARACTER:
-            if (!normalizePlayerName(nameOrIP))
+                break;
+            case BAN_CHARACTER:
+                if (!normalizePlayerName(nameOrIP))
+                    return 0;
+                break;
+            case BAN_IP:
+                if (!IsIPAddress(nameOrIP.c_str()))
+                    return 0;
+                break;
+            default:
                 return 0;
-            break;
-        case BAN_IP:
-            if (!IsIPAddress(nameOrIP.c_str()))
-                return 0;
-            break;
-        default:
-            return 0;
         }
 
         eWorld->BanAccount((BanMode)banMode, nameOrIP, duration, reason, whoBanned);
@@ -1193,10 +1230,24 @@ namespace LuaGlobalFunctions
         uint32 senderGUIDLow = Eluna::CHECKVAL<uint32>(L, ++i, 0);
         uint32 stationary = Eluna::CHECKVAL<uint32>(L, ++i, MAIL_STATIONERY_DEFAULT);
         uint32 delay = Eluna::CHECKVAL<uint32>(L, ++i, 0);
+        uint32 money = Eluna::CHECKVAL<uint32>(L, ++i, 0);
+        uint32 cod = Eluna::CHECKVAL<uint32>(L, ++i, 0);
         int argAmount = lua_gettop(L);
 
         MailSender sender(MAIL_NORMAL, senderGUIDLow, (MailStationery)stationary);
         MailDraft draft(subject, text);
+
+#ifdef TRINITY
+        if (cod)
+            draft.AddCOD(cod);
+        if (money)
+            draft.AddMoney(money);
+#else
+        if (cod)
+            draft.SetCOD(cod);
+        if (money)
+            draft.SetMoney(money);
+#endif
 
 #ifdef TRINITY
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
@@ -1228,7 +1279,6 @@ namespace LuaGlobalFunctions
                 item->SaveToDB();
 #else
                 item->SaveToDB(trans);
-                SQLTransaction trans = CharacterDatabase.BeginTransaction();
 #endif
                 draft.AddItem(item);
                 ++addedItems;

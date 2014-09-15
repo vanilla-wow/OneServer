@@ -872,6 +872,9 @@ void World::LoadConfigSettings(bool reload)
     sLog.outString("WORLD: mmap pathfinding %sabled", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "en" : "dis");
 
     setConfig(CONFIG_BOOL_ELUNA_ENABLED, "Eluna.Enabled", true);
+
+    if (reload)
+        sEluna->OnConfigLoad(reload);
 }
 
 /// Initialize the World
@@ -1287,6 +1290,7 @@ void World::SetInitialWorldSettings()
     ///- Initialize Lua Engine
     sLog.outString("Initialize Eluna Lua Engine...");
     Eluna::Initialize();
+    sEluna->OnConfigLoad(false); // Must be done after Eluna is initialized.
 
     ///- Initialize game time and timers
     sLog.outString("DEBUG:: Initialize game time and timers");
@@ -1534,6 +1538,9 @@ void World::Update(uint32 diff)
 
     // And last, but not least handle the issued cli commands
     ProcessCliCommands();
+
+    ///- Used by Eluna
+    sEluna->OnWorldUpdate(diff);
 
     // cleanup unused GridMap objects as well as VMaps
     sTerrainMgr.Update(diff);
@@ -1829,6 +1836,8 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
         m_ShutdownTimer = time;
         ShutdownMsg(true);
     }
+    ///- Used by Eluna
+    sEluna->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
 
 /// Display a shutdown message to the user(s)
@@ -1870,6 +1879,9 @@ void World::ShutdownCancel()
     SendServerMessage(msgid);
 
     DEBUG_LOG("Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"));
+
+    ///- Used by Eluna
+    sEluna->OnShutdownCancel();
 }
 
 void World::UpdateSessions(uint32 /*diff*/)
