@@ -147,12 +147,11 @@ enum Stats
 
 enum Powers
 {
-    POWER_MANA                          = 0,
-    POWER_RAGE                          = 1,
-    POWER_FOCUS                         = 2,
-    POWER_ENERGY                        = 3,
-    POWER_HAPPINESS                     = 4,
-    MAX_POWERS                          = 5,
+    POWER_MANA                          = 0,            // UNIT_FIELD_POWER1
+    POWER_RAGE                          = 1,            // UNIT_FIELD_POWER2
+    POWER_FOCUS                         = 2,            // UNIT_FIELD_POWER3
+    POWER_ENERGY                        = 3,            // UNIT_FIELD_POWER4
+    POWER_HAPPINESS                     = 4,            // UNIT_FIELD_POWER5
     POWER_ALL                           = 127,          // default for class? - need check for TBC
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
@@ -1188,7 +1187,8 @@ enum DamageEffectType
     DOT                     = 2,
     HEAL                    = 3,
     NODAMAGE                = 4,                            //< used also in case when damage applied to health but not applied to spell channelInterruptFlags/etc
-    SELF_DAMAGE             = 5
+    SELF_DAMAGE_ROGUE_FALL  = 5,                            //< used to avoid rogue loosing stealth on falling damage
+    SELF_DAMAGE             = 6
 };
 
 enum GameobjectTypes

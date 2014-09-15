@@ -1793,10 +1793,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case SPELL_EFFECT_QUEST_COMPLETE:
                 case SPELL_EFFECT_KILL_CREDIT_GROUP:
                     targetB = SPELL_TARGETS_ALL;
+                    break;
                 default:
                     // Select friendly targets for positive effect
                     if (IsPositiveEffect(m_spellInfo, effIndex))
                         targetB = SPELL_TARGETS_FRIENDLY;
+                    break;
             }
 
             UnitList tempTargetUnitMap;
@@ -4815,7 +4817,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 // Can be area effect, Check only for players and not check if target - caster (spell can have multiply drain/burn effects)
                 if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     if (Unit* target = m_targets.getUnitTarget())
-                        if (target != m_caster && int32(target->getPowerType()) != m_spellInfo->EffectMiscValue[i])
+                        if (target != m_caster && int32(target->GetPowerType()) != m_spellInfo->EffectMiscValue[i])
                             return SPELL_FAILED_BAD_TARGETS;
                 break;
             }
@@ -5148,7 +5150,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->GetTypeId() != TYPEID_PLAYER || m_CastItem)
                     break;
 
-                if (expectedTarget->getPowerType() != POWER_MANA)
+                if (expectedTarget->GetPowerType() != POWER_MANA)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 break;

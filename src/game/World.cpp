@@ -150,7 +150,6 @@ void World::CleanupsBeforeStop()
     KickAll();                                       // save and kick all players
     UpdateSessions(1);                               // real players unload required UpdateSessions call
     sBattleGroundMgr.DeleteAllBattleGrounds();       // unload battleground templates before different singletons destroyed
-    Eluna::Uninitialize();
 }
 
 /// Find a player in a specified zone
@@ -874,8 +873,6 @@ void World::LoadConfigSettings(bool reload)
     MMAP::MMapFactory::preventPathfindingOnMaps(ignoreMapIds.c_str());
     sLog.outString("WORLD: mmap pathfinding %sabled", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "en" : "dis");
 
-    setConfig(CONFIG_BOOL_ELUNA_ENABLED, "Eluna.Enabled", false);
- 
     // Warden
     setConfig(CONFIG_BOOL_WARDEN_ENABLED, "Warden.Enabled", false);
     setConfig(CONFIG_FLOAT_WARDEN_KICK_BAN, "Warden.Kick.Ban", 0);
@@ -883,6 +880,8 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_WARDEN_CLIENT_CHECK_HOLDOFF, "Warden.ClientCheckHoldOff", 30);
     setConfig(CONFIG_UINT32_WARDEN_CLIENT_RESPONSE_DELAY, "Warden.ClientResponseDelay", 15);
     setConfig(CONFIG_UINT32_WARDEN_BAN_TIME, "Warden.BanLength", 900000);
+
+    setConfig(CONFIG_BOOL_ELUNA_ENABLED, "Eluna.Enabled", true);
 }
 
 /// Initialize the World
@@ -2268,4 +2267,11 @@ bool World::configNoReload(bool reload, eConfigBoolValues index, char const* fie
         sLog.outError("%s option can't be changed at mangosd.conf reload, using current value (%s).", fieldname, getConfig(index) ? "'true'" : "'false'");
 
     return false;
+}
+
+void World::InvalidatePlayerDataToAllClient(ObjectGuid guid)
+{
+    WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
+    data << guid;
+    SendGlobalMessage(&data);
 }

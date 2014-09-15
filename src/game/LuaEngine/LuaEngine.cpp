@@ -4,20 +4,26 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
-#include <ace/ACE.h>
-#include <ace/Dirent.h>
-#include <ace/OS_NS_sys_stat.h>
 #include "HookMgr.h"
 #include "LuaEngine.h"
 #include "ElunaBinding.h"
 #include "ElunaEventMgr.h"
 #include "ElunaIncludes.h"
 #include "ElunaTemplate.h"
-#include "ElunaUtilitiy.h"
+#include "ElunaUtility.h"
+
+// Some dummy includes containing BOOST_VERSION:
+// ObjectAccessor.h Config.h Log.h
+#ifdef BOOST_VERSION
+#include <boost/filesystem.hpp>
+#else
+#include <ace/ACE.h>
+#include <ace/Dirent.h>
+#include <ace/OS_NS_sys_stat.h>
+#endif
 
 extern "C"
 {
-#include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
 };
@@ -70,12 +76,10 @@ void Eluna::ReloadEluna()
 #ifdef TRINITY
     // Re initialize creature AI restoring C++ AI or applying lua AI
     {
-        TRINITY_READ_GUARD(HashMapHolder<Creature>::LockType, *HashMapHolder<Creature>::GetLock());
-        HashMapHolder<Creature>::MapType const& m = ObjectAccessor::GetCreatures();
+        HashMapHolder<Creature>::MapType const m = ObjectAccessor::GetCreatures();
         for (HashMapHolder<Creature>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
-        {
-            iter->second->AIM_Initialize();
-        }
+            if (iter->second->IsInWorld())
+                iter->second->AIM_Initialize();
     }
 #endif
 
@@ -150,11 +154,66 @@ Eluna::~Eluna()
     lua_close(L);
 }
 
+void Eluna::AddScriptPath(std::string filename, std::string fullpath, ScriptList& scripts)
+{
+    ELUNA_LOG_DEBUG("[Eluna]: AddScriptPath Checking file `%s`", fullpath.c_str());
+
+    // split file name
+    std::size_t extDot = filename.find_last_of('.');
+    if (extDot == std::string::npos)
+        return;
+    std::string ext = filename.substr(extDot);
+    filename = filename.substr(0, extDot);
+
+    // check extension and add path to scripts to load
+    bool luascript = ext == ".lua" || ext == ".dll";
+    bool extension = ext == ".ext" || (filename.length() >= 4 && filename.find_last_of("_ext") == filename.length() - 4);
+    if (!luascript && !extension)
+        return;
+
+    LuaScript script;
+    script.fileext = ext;
+    script.filename = filename;
+    script.filepath = fullpath;
+    script.modulepath = fullpath.substr(0, fullpath.length() - ext.length());
+    if (extension)
+        lua_extensions.push_back(script);
+    else
+        scripts.push_back(script);
+    ELUNA_LOG_DEBUG("[Eluna]: GetScripts add path `%s`", fullpath.c_str());
+}
+
 // Finds lua script files from given path (including subdirectories) and pushes them to scripts
 void Eluna::GetScripts(std::string path, ScriptList& scripts)
 {
     ELUNA_LOG_DEBUG("[Eluna]: GetScripts from path `%s`", path.c_str());
 
+#ifdef BOOST_VERSION
+    boost::filesystem::path someDir(path);
+    boost::filesystem::directory_iterator end_iter;
+
+    if (boost::filesystem::exists(someDir) && boost::filesystem::is_directory(someDir))
+    {
+        for (boost::filesystem::directory_iterator dir_iter(someDir); dir_iter != end_iter; ++dir_iter)
+        {
+            std::string fullpath = dir_iter->path().generic_string();
+
+            // load subfolder
+            if (boost::filesystem::is_directory(dir_iter->status()))
+            {
+                GetScripts(fullpath, scripts);
+                continue;
+            }
+
+            if (boost::filesystem::is_regular_file(dir_iter->status()))
+            {
+                // was file, try add
+                std::string filename = dir_iter->path().filename().generic_string();
+                AddScriptPath(filename, fullpath, scripts);
+            }
+        }
+    }
+#else
     ACE_Dirent dir;
     if (dir.open(path.c_str()) == -1)
     {
@@ -183,34 +242,16 @@ void Eluna::GetScripts(std::string path, ScriptList& scripts)
             continue;
         }
 
-        // was file, check extension
-        ELUNA_LOG_DEBUG("[Eluna]: GetScripts Checking file `%s`", fullpath.c_str());
-
-        // split file name
+        // was file, try add
         std::string filename = directory->d_name;
-        uint32 extDot = filename.find_last_of('.');
-        if (extDot == std::string::npos)
-            continue;
-        std::string ext = filename.substr(extDot);
-        filename = filename.substr(0, extDot);
-
-        // check extension and add path to scripts to load
-        bool luascript = ext == ".lua" || ext == ".dll";
-        bool extension = ext == ".ext" || (filename.length() >= 4 && filename.find_last_of("_ext") == filename.length() - 4);
-        if (!luascript && !extension)
-            continue;
-
-        LuaScript script;
-        script.fileext = ext;
-        script.filename = filename;
-        script.filepath = fullpath;
-        script.modulepath = fullpath.substr(0, fullpath.length() - ext.length());
-        if (extension)
-            lua_extensions.push_back(script);
-        else
-            scripts.push_back(script);
-        ELUNA_LOG_DEBUG("[Eluna]: GetScripts add path `%s`", fullpath.c_str());
+        AddScriptPath(filename, fullpath, scripts);
     }
+#endif
+}
+
+static bool ScriptpathComparator(const LuaScript& first, const LuaScript& second)
+{
+    return first.filepath.compare(second.filepath) < 0;
 }
 
 void Eluna::RunScripts()
@@ -219,6 +260,8 @@ void Eluna::RunScripts()
     uint32 count = 0;
 
     ScriptList scripts;
+    lua_extensions.sort(ScriptpathComparator);
+    lua_scripts.sort(ScriptpathComparator);
     scripts.insert(scripts.end(), lua_extensions.begin(), lua_extensions.end());
     scripts.insert(scripts.end(), lua_scripts.begin(), lua_scripts.end());
 
@@ -276,18 +319,22 @@ void Eluna::RemoveRef(const void* obj)
 void Eluna::report(lua_State* L)
 {
     const char* msg = lua_tostring(L, -1);
-    while (msg)
-    {
-        lua_pop(L, 1);
-        ELUNA_LOG_ERROR("%s", msg);
-        msg = lua_tostring(L, -1);
-    }
+    ELUNA_LOG_ERROR("%s", msg);
+    lua_pop(L, 1);
 }
 
 void Eluna::ExecuteCall(lua_State* L, int params, int res)
 {
     int top = lua_gettop(L);
-    luaL_checktype(L, top - params, LUA_TFUNCTION);
+    int type = lua_type(L, top - params);
+
+    if (type != LUA_TFUNCTION)
+    {
+        lua_pop(L, params + 1);  // Cleanup the stack.
+        ELUNA_LOG_ERROR("[Eluna]: Cannot execute call: registered value is a %s, not a function.", lua_typename(L, type));
+        return;
+    }
+
     if (lua_pcall(L, params, res, 0))
         report(L);
 }
@@ -413,150 +460,115 @@ void Eluna::Push(lua_State* L, Object const* obj)
         ElunaTemplate<Object>::push(L, obj);
     }
 }
+
+static int32 CheckIntegerRange(lua_State *L, int narg, int32 min, int32 max)
+{
+    int64 value = luaL_checknumber(L, narg);
+    char error_buffer[64];
+
+    if (value > max)
+    {
+        snprintf(error_buffer, 64, "value must be less than %d", max);
+        return luaL_argerror(L, narg, error_buffer);
+    }
+
+    if (value < min)
+    {
+        snprintf(error_buffer, 64, "value must be greater than %d", min);
+        return luaL_argerror(L, narg, error_buffer);
+    }
+
+    return value;
+}
+
+static uint32 CheckUnsignedRange(lua_State *L, int narg, uint32 max)
+{
+    int64 value = luaL_checknumber(L, narg);
+    char error_buffer[64];
+
+    if (value < 0)
+        return luaL_argerror(L, narg, "value must be greater than 0");
+
+    if (value > max)
+    {
+        snprintf(error_buffer, 64, "value must be less than %u", max);
+        return luaL_argerror(L, narg, error_buffer);
+    }
+
+    return value;
+}
+
 template<> bool Eluna::CHECKVAL<bool>(lua_State* L, int narg)
 {
-    return lua_isnumber(L, narg) ? luaL_optnumber(L, narg, 1) ? true : false : lua_toboolean(L, narg);
-}
-template<> bool Eluna::CHECKVAL<bool>(lua_State* L, int narg, bool def)
-{
-    return lua_isnone(L, narg) ? def : lua_isnumber(L, narg) ? luaL_optnumber(L, narg, 1) ? true : false : lua_toboolean(L, narg);
+    return lua_toboolean(L, narg) != 0;
 }
 template<> float Eluna::CHECKVAL<float>(lua_State* L, int narg)
 {
     return luaL_checknumber(L, narg);
 }
-template<> float Eluna::CHECKVAL<float>(lua_State* L, int narg, float def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isnumber(L, narg))
-        return def;
-    return luaL_optnumber(L, narg, def);
-}
 template<> double Eluna::CHECKVAL<double>(lua_State* L, int narg)
 {
     return luaL_checknumber(L, narg);
 }
-template<> double Eluna::CHECKVAL<double>(lua_State* L, int narg, double def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isnumber(L, narg))
-        return def;
-    return luaL_optnumber(L, narg, def);
-}
 template<> int8 Eluna::CHECKVAL<int8>(lua_State* L, int narg)
 {
-    return luaL_checkint(L, narg);
-}
-template<> int8 Eluna::CHECKVAL<int8>(lua_State* L, int narg, int8 def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isnumber(L, narg))
-        return def;
-    return luaL_optint(L, narg, def);
+    return CheckIntegerRange(L, narg, SCHAR_MIN, SCHAR_MAX);
 }
 template<> uint8 Eluna::CHECKVAL<uint8>(lua_State* L, int narg)
 {
-    return luaL_checkunsigned(L, narg);
-}
-template<> uint8 Eluna::CHECKVAL<uint8>(lua_State* L, int narg, uint8 def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isnumber(L, narg))
-        return def;
-    return luaL_optunsigned(L, narg, def);
+    return CheckUnsignedRange(L, narg, UCHAR_MAX);
 }
 template<> int16 Eluna::CHECKVAL<int16>(lua_State* L, int narg)
 {
-    return luaL_checkint(L, narg);
-}
-template<> int16 Eluna::CHECKVAL<int16>(lua_State* L, int narg, int16 def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isnumber(L, narg))
-        return def;
-    return luaL_optint(L, narg, def);
+    return CheckIntegerRange(L, narg, SHRT_MIN, SHRT_MAX);
 }
 template<> uint16 Eluna::CHECKVAL<uint16>(lua_State* L, int narg)
 {
-    return luaL_checkunsigned(L, narg);
-}
-template<> uint16 Eluna::CHECKVAL<uint16>(lua_State* L, int narg, uint16 def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isnumber(L, narg))
-        return def;
-    return luaL_optunsigned(L, narg, def);
-}
-template<> uint32 Eluna::CHECKVAL<uint32>(lua_State* L, int narg)
-{
-    return luaL_checkunsigned(L, narg);
-}
-template<> uint32 Eluna::CHECKVAL<uint32>(lua_State* L, int narg, uint32 def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isnumber(L, narg))
-        return def;
-    return luaL_optunsigned(L, narg, def);
+    return CheckUnsignedRange(L, narg, USHRT_MAX);
 }
 template<> int32 Eluna::CHECKVAL<int32>(lua_State* L, int narg)
 {
-    return luaL_checklong(L, narg);
+    return CheckIntegerRange(L, narg, INT_MIN, INT_MAX);
 }
-template<> int32 Eluna::CHECKVAL<int32>(lua_State* L, int narg, int32 def)
+template<> uint32 Eluna::CHECKVAL<uint32>(lua_State* L, int narg)
 {
-    if (lua_isnoneornil(L, narg) || !lua_isnumber(L, narg))
-        return def;
-    return luaL_optlong(L, narg, def);
+    return CheckUnsignedRange(L, narg, UINT_MAX);
 }
 template<> const char* Eluna::CHECKVAL<const char*>(lua_State* L, int narg)
 {
     return luaL_checkstring(L, narg);
 }
-template<> const char* Eluna::CHECKVAL<const char*>(lua_State* L, int narg, const char* def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isstring(L, narg))
-        return def;
-    return luaL_optstring(L, narg, def);
-}
 template<> std::string Eluna::CHECKVAL<std::string>(lua_State* L, int narg)
 {
     return luaL_checkstring(L, narg);
-}
-template<> std::string Eluna::CHECKVAL<std::string>(lua_State* L, int narg, std::string def)
-{
-    if (lua_isnoneornil(L, narg) || !lua_isstring(L, narg))
-        return def;
-    return luaL_optstring(L, narg, def.c_str());
-}
-template<> uint64 Eluna::CHECKVAL<uint64>(lua_State* L, int narg)
-{
-    const char* c_str = CHECKVAL<const char*>(L, narg, NULL);
-    if (!c_str)
-        return luaL_argerror(L, narg, "uint64 (as string) expected");
-    uint64 l = 0;
-    sscanf(c_str, UI64FMTD, &l);
-    return l;
-}
-template<> uint64 Eluna::CHECKVAL<uint64>(lua_State* L, int narg, uint64 def)
-{
-    const char* c_str = CHECKVAL<const char*>(L, narg, NULL);
-    if (!c_str)
-        return def;
-    uint64 l = 0;
-    sscanf(c_str, UI64FMTD, &l);
-    return l;
 }
 template<> int64 Eluna::CHECKVAL<int64>(lua_State* L, int narg)
 {
     const char* c_str = CHECKVAL<const char*>(L, narg, NULL);
     if (!c_str)
         return luaL_argerror(L, narg, "int64 (as string) expected");
+
     int64 l = 0;
-    sscanf(c_str, SI64FMTD, &l);
+    int parsed_count = sscanf(c_str, SI64FMTD, &l);
+    if (parsed_count != 1)
+        return luaL_argerror(L, narg, "int64 (as string) could not be converted");
+
     return l;
 }
-template<> int64 Eluna::CHECKVAL<int64>(lua_State* L, int narg, int64 def)
+template<> uint64 Eluna::CHECKVAL<uint64>(lua_State* L, int narg)
 {
     const char* c_str = CHECKVAL<const char*>(L, narg, NULL);
     if (!c_str)
-        return def;
-    int64 l = 0;
-    sscanf(c_str, SI64FMTD, &l);
+        return luaL_argerror(L, narg, "uint64 (as string) expected");
+
+    uint64 l = 0;
+    int parsed_count = sscanf(c_str, UI64FMTD, &l);
+    if (parsed_count != 1)
+        return luaL_argerror(L, narg, "uint64 (as string) could not be converted");
+
     return l;
 }
+
 #define TEST_OBJ(T, O, E, F)\
 {\
     if (!O || !O->F())\

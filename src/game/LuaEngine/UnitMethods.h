@@ -555,12 +555,12 @@ namespace LuaUnit
 
     Powers PowerSelectorHelper(lua_State* L, Unit* unit, int powerType = -1)
     {
-#if (!defined(TRINITY) && defined(WOTLK))
-        if (powerType == -1)
-            return unit->GetPowerType();
-#else
+#ifdef TRINITY
         if (powerType == -1)
             return unit->getPowerType();
+#else
+        if (powerType == -1)
+            return unit->GetPowerType();
 #endif
 
         if (powerType < 0 || powerType >= int(MAX_POWERS))
@@ -603,10 +603,10 @@ namespace LuaUnit
 
     int GetPowerType(lua_State* L, Unit* unit)
     {
-#if (!defined(TRINITY) && defined(WOTLK))
-        Eluna::Push(L, unit->GetPowerType());
-#else
+#ifdef TRINITY
         Eluna::Push(L, unit->getPowerType());
+#else
+        Eluna::Push(L, unit->GetPowerType());
 #endif
         return 1;
     }
@@ -919,10 +919,11 @@ namespace LuaUnit
         uint32 type = Eluna::CHECKVAL<uint32>(L, 2);
         if (type >= int(MAX_POWERS))
             return luaL_argerror(L, 2, "valid Powers expected");
-#if (!defined(TRINITY) && defined(WOTLK))
-        unit->SetPowerType((Powers)type);
-#else
+
+#ifdef TRINITY
         unit->setPowerType((Powers)type);
+#else
+        unit->SetPowerType((Powers)type);
 #endif
         return 0;
     }
@@ -1361,28 +1362,28 @@ namespace LuaUnit
     }
 
     /**
-    Casts the spell at target.
-    pb0, 1 and 2 are modifiers for the base points of the spell.
-
-    @param &Unit target
-    @param uint32 spell
-    @param bool triggered = false
-    @param int32 bp0 = nil
-    @param int32 bp1 = nil
-    @param int32 bp2 = nil
-    @param &Item castItem = nil
-    @param uint64 originalCaster = 0
-    */
+     * Casts the [Spell] at target [Unit] with custom basepoints or casters.
+     * See also [Unit:CastSpell].
+     *
+     * @param [Unit] target
+     * @param uint32 spell
+     * @param bool triggered = false
+     * @param int32 bp0 = nil : custom basepoints for [Spell] effect 1. If nil, no change is made
+     * @param int32 bp1 = nil : custom basepoints for [Spell] effect 2. If nil, no change is made
+     * @param int32 bp2 = nil : custom basepoints for [Spell] effect 3. If nil, no change is made
+     * @param [Item] castItem = nil
+     * @param uint64 originalCaster = 0
+     */
     int CastCustomSpell(lua_State* L, Unit* unit)
     {
         Unit* target = Eluna::CHECKOBJ<Unit>(L, 2);
         uint32 spell = Eluna::CHECKVAL<uint32>(L, 3);
         bool triggered = Eluna::CHECKVAL<bool>(L, 4, false);
-        bool has_bp0 = lua_isnoneornil(L, 5);
+        bool has_bp0 = !lua_isnoneornil(L, 5);
         int32 bp0 = Eluna::CHECKVAL<int32>(L, 5, 0);
-        bool has_bp1 = lua_isnoneornil(L, 6);
+        bool has_bp1 = !lua_isnoneornil(L, 6);
         int32 bp1 = Eluna::CHECKVAL<int32>(L, 6, 0);
-        bool has_bp2 = lua_isnoneornil(L, 7);
+        bool has_bp2 = !lua_isnoneornil(L, 7);
         int32 bp2 = Eluna::CHECKVAL<int32>(L, 7, 0);
         Item* castItem = Eluna::CHECKOBJ<Item>(L, 8, false);
         uint64 originalCaster = Eluna::CHECKVAL<uint64>(L, 9, 0);
@@ -1593,7 +1594,7 @@ namespace LuaUnit
         Unit* target = Eluna::CHECKOBJ<Unit>(L, 2);
         uint32 spell = Eluna::CHECKVAL<uint32>(L, 3);
         uint32 amount = Eluna::CHECKVAL<uint32>(L, 4);
-        uint32 critical = Eluna::CHECKVAL<uint32>(L, 5, false);
+        bool critical = Eluna::CHECKVAL<bool>(L, 5, false);
 
 #ifndef TRINITY
         if (const SpellInfo* info = sSpellStore.LookupEntry(spell))
@@ -1614,6 +1615,48 @@ namespace LuaUnit
         unit->DealDamage(target, target->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, durLoss);
 #else
         unit->Kill(target, durLoss);
+#endif
+        return 0;
+    }
+
+    /**
+     * Adds threat to the [Unit] from the victim.
+     *
+     * <pre>
+     * enum SpellSchoolMask
+     * {
+     *     SPELL_SCHOOL_MASK_NONE    = 0,
+     *     SPELL_SCHOOL_MASK_NORMAL  = 1,
+     *     SPELL_SCHOOL_MASK_HOLY    = 2,
+     *     SPELL_SCHOOL_MASK_FIRE    = 4,
+     *     SPELL_SCHOOL_MASK_NATURE  = 8,
+     *     SPELL_SCHOOL_MASK_FROST   = 16,
+     *     SPELL_SCHOOL_MASK_SHADOW  = 32,
+     *     SPELL_SCHOOL_MASK_ARCANE  = 64,
+     * }
+     * </pre>
+     *
+     * @param [Unit] victim : [Unit] that caused the threat
+     * @param float threat : threat amount
+     * @param [SpellSchoolMask] schoolMask = 0 : [SpellSchoolMask] of the threat causer
+     * @param uint32 spell = 0 : spell entry used for threat
+     */
+    int AddThreat(lua_State* L, Unit* unit)
+    {
+        Unit* victim = Eluna::CHECKOBJ<Unit>(L, 2);
+        float threat = Eluna::CHECKVAL<float>(L, 3, true);
+        uint32 schoolMask = Eluna::CHECKVAL<uint32>(L, 3, 0);
+        uint32 spell = Eluna::CHECKVAL<uint32>(L, 3, 0);
+
+        if (schoolMask > SPELL_SCHOOL_MASK_ALL)
+        {
+            return luaL_argerror(L, 3, "valid SpellSchoolMask expected");
+        }
+
+#ifdef TRINITY
+        unit->AddThreat(victim, threat, (SpellSchoolMask)schoolMask, spell ? sSpellMgr->GetSpellInfo(spell) : NULL);
+#else
+        unit->AddThreat(victim, threat, false, (SpellSchoolMask)schoolMask, spell ? sSpellStore.LookupEntry(spell) : NULL);
 #endif
         return 0;
     }

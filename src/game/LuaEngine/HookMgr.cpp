@@ -190,9 +190,10 @@ void Eluna::OnPacketSendAny(Player* player, WorldPacket& packet, bool& result)
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (WorldPacket* data = CHECKOBJ<WorldPacket>(L, i, false))
-            packet = *data;
-        if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isuserdata(L, i))
+            if (WorldPacket* data = CHECKOBJ<WorldPacket>(L, i, false))
+                packet = *data;
+        if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -210,9 +211,10 @@ void Eluna::OnPacketSendOne(Player* player, WorldPacket& packet, bool& result)
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (WorldPacket* data = CHECKOBJ<WorldPacket>(L, i, false))
-            packet = *data;
-        if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isuserdata(L, i))
+            if (WorldPacket* data = CHECKOBJ<WorldPacket>(L, i, false))
+                packet = *data;
+        if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -241,9 +243,10 @@ void Eluna::OnPacketReceiveAny(Player* player, WorldPacket& packet, bool& result
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (WorldPacket* data = CHECKOBJ<WorldPacket>(L, i, false))
-            packet = *data;
-        if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isuserdata(L, i))
+            if (WorldPacket* data = CHECKOBJ<WorldPacket>(L, i, false))
+                packet = *data;
+        if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -261,9 +264,10 @@ void Eluna::OnPacketReceiveOne(Player* player, WorldPacket& packet, bool& result
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (WorldPacket* data = CHECKOBJ<WorldPacket>(L, i, false))
-            packet = *data;
-        if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isuserdata(L, i))
+            if (WorldPacket* data = CHECKOBJ<WorldPacket>(L, i, false))
+                packet = *data;
+        if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -477,9 +481,8 @@ bool Eluna::OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targ
     ENTRY_EXECUTE(1);
     FOR_RETS(i)
     {
-        if (lua_isnoneornil(L, i))
-            continue;
-        result = CHECKVAL<bool>(L, i, result);
+        if (lua_isboolean(L, i))
+            result = CHECKVAL<bool>(L, i, result);
     }
     ENDCALL();
     return result;
@@ -495,9 +498,8 @@ bool Eluna::OnItemGossip(Player* pPlayer, Item* pItem, SpellCastTargets const& /
     ENTRY_EXECUTE(1);
     FOR_RETS(i)
     {
-        if (lua_isnoneornil(L, i))
-            continue;
-        result = CHECKVAL<bool>(L, i, result);
+        if (lua_isboolean(L, i))
+            result = CHECKVAL<bool>(L, i, result);
     }
     ENDCALL();
     return result;
@@ -556,9 +558,8 @@ bool Eluna::OnCommand(Player* player, const char* text)
     EVENT_EXECUTE(1);
     FOR_RETS(i)
     {
-        if (lua_isnoneornil(L, i))
-            continue;
-        result = CHECKVAL<bool>(L, i, result);
+        if (lua_isboolean(L, i))
+            result = CHECKVAL<bool>(L, i, result);
     }
     ENDCALL();
     return result;
@@ -637,7 +638,7 @@ InventoryResult Eluna::OnCanUseItem(const Player* pPlayer, uint32 itemEntry)
     EVENT_EXECUTE(1);
     FOR_RETS(i)
     {
-        if (lua_isnoneornil(L, i))
+        if (!lua_isnumber(L, i))
             continue;
         uint32 res = CHECKVAL<uint32>(L, i, EQUIP_ERR_OK);
         if (res != EQUIP_ERR_OK)
@@ -735,9 +736,8 @@ void Eluna::OnGiveXP(Player* pPlayer, uint32& amount, Unit* pVictim)
     EVENT_EXECUTE(1);
     FOR_RETS(i)
     {
-        if (lua_isnoneornil(L, i))
-            continue;
-        amount = CHECKVAL<uint32>(L, i, amount);
+        if (lua_isnumber(L, i))
+            amount = CHECKVAL<uint32>(L, i, amount);
     }
     ENDCALL();
 }
@@ -752,9 +752,8 @@ void Eluna::OnReputationChange(Player* pPlayer, uint32 factionID, int32& standin
     EVENT_EXECUTE(1);
     FOR_RETS(i)
     {
-        if (lua_isnoneornil(L, i))
-            continue;
-        standing = CHECKVAL<uint32>(L, i, standing);
+        if (lua_isnumber(L, i))
+            standing = CHECKVAL<uint32>(L, i, standing);
     }
     ENDCALL();
 }
@@ -888,8 +887,11 @@ void Eluna::OnMapChanged(Player* player)
 
 bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg)
 {
-    if (lang == LANG_ADDON && OnAddonMessage(pPlayer, type, msg, NULL, NULL, NULL, NULL))
+    if (lang == LANG_ADDON)
+    {
+        OnAddonMessage(pPlayer, type, msg, NULL, NULL, NULL, NULL);
         return true;
+    }
     bool result = true;
     EVENT_BEGIN(PlayerEventBindings, PLAYER_EVENT_ON_CHAT, return result);
     Push(L, pPlayer);
@@ -901,9 +903,12 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg)
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
-            msg = std::string(c_str);
-        else if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isstring(L, i))
+        {
+            if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
+                msg = std::string(c_str);
+        }
+        else if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -915,8 +920,11 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg)
 
 bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, Group* pGroup)
 {
-    if (lang == LANG_ADDON && OnAddonMessage(pPlayer, type, msg, NULL, NULL, pGroup, NULL))
+    if (lang == LANG_ADDON)
+    {
+        OnAddonMessage(pPlayer, type, msg, NULL, NULL, pGroup, NULL);
         return true;
+    }
     bool result = true;
     EVENT_BEGIN(PlayerEventBindings, PLAYER_EVENT_ON_GROUP_CHAT, return result);
     Push(L, pPlayer);
@@ -929,9 +937,12 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, 
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
-            msg = std::string(c_str);
-        else if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isstring(L, i))
+        {
+            if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
+                msg = std::string(c_str);
+        }
+        else if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -943,8 +954,11 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, 
 
 bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, Guild* pGuild)
 {
-    if (lang == LANG_ADDON && OnAddonMessage(pPlayer, type, msg, NULL, pGuild, NULL, NULL))
+    if (lang == LANG_ADDON)
+    {
+        OnAddonMessage(pPlayer, type, msg, NULL, pGuild, NULL, NULL);
         return true;
+    }
     bool result = true;
     EVENT_BEGIN(PlayerEventBindings, PLAYER_EVENT_ON_GUILD_CHAT, return result);
     Push(L, pPlayer);
@@ -957,9 +971,12 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, 
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
-            msg = std::string(c_str);
-        else if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isstring(L, i))
+        {
+            if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
+                msg = std::string(c_str);
+        }
+        else if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -971,8 +988,11 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, 
 
 bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, Channel* pChannel)
 {
-    if (lang == LANG_ADDON && OnAddonMessage(pPlayer, type, msg, NULL, NULL, NULL, pChannel))
+    if (lang == LANG_ADDON)
+    {
+        OnAddonMessage(pPlayer, type, msg, NULL, NULL, NULL, pChannel);
         return true;
+    }
     bool result = true;
     EVENT_BEGIN(PlayerEventBindings, PLAYER_EVENT_ON_CHANNEL_CHAT, return result);
     Push(L, pPlayer);
@@ -985,9 +1005,12 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, 
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
-            msg = std::string(c_str);
-        else if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isstring(L, i))
+        {
+            if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
+                msg = std::string(c_str);
+        }
+        else if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -999,8 +1022,11 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, 
 
 bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, Player* pReceiver)
 {
-    if (lang == LANG_ADDON && OnAddonMessage(pPlayer, type, msg, pReceiver, NULL, NULL, NULL))
+    if (lang == LANG_ADDON)
+    {
+        OnAddonMessage(pPlayer, type, msg, pReceiver, NULL, NULL, NULL);
         return true;
+    }
     bool result = true;
     EVENT_BEGIN(PlayerEventBindings, PLAYER_EVENT_ON_WHISPER, return result);
     Push(L, pPlayer);
@@ -1013,9 +1039,12 @@ bool Eluna::OnChat(Player* pPlayer, uint32 type, uint32 lang, std::string& msg, 
     {
         if (lua_isnoneornil(L, i))
             continue;
-        if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
-            msg = std::string(c_str);
-        else if (!CHECKVAL<bool>(L, i, true))
+        if (lua_isstring(L, i))
+        {
+            if (const char* c_str = CHECKVAL<const char*>(L, i, NULL))
+                msg = std::string(c_str);
+        }
+        else if (lua_isboolean(L, i) && !CHECKVAL<bool>(L, i, true))
         {
             result = false;
             break;
@@ -1479,9 +1508,8 @@ struct ElunaCreatureAI : ScriptedAI
         ENTRY_EXECUTE(1);
         FOR_RETS(i)
         {
-            if (lua_isnoneornil(L, i))
-                continue;
-            damage = Eluna::CHECKVAL<uint32>(L, i, damage);
+            if (lua_isnumber(L, i))
+                damage = Eluna::CHECKVAL<uint32>(L, i, damage);
         }
         ENDCALL();
     }
@@ -1619,9 +1647,8 @@ struct ElunaCreatureAI : ScriptedAI
         ENTRY_EXECUTE(1);
         FOR_RETS(i)
         {
-            if (lua_isnoneornil(L, i))
-                continue;
-            respawnDelay = Eluna::CHECKVAL<uint32>(L, i, respawnDelay);
+            if (lua_isnumber(L, i))
+                respawnDelay = Eluna::CHECKVAL<uint32>(L, i, respawnDelay);
         }
         ENDCALL();
     }
