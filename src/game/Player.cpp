@@ -12951,9 +12951,19 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, Object* questGiver,
     switch (questGiver->GetTypeId())
     {
         case TYPEID_UNIT:
+            if (sEluna->OnQuestReward(this, (Creature*)questGiver, pQuest, reward))
+            {
+                handled = true;
+                break;
+            }
             handled = sScriptMgr.OnQuestRewarded(this, (Creature*)questGiver, pQuest);
             break;
         case TYPEID_GAMEOBJECT:
+            if (sEluna->OnQuestReward(this, (GameObject*)questGiver, pQuest, reward))
+            {
+                handled = true;
+                break;
+            }
             handled = sScriptMgr.OnQuestRewarded(this, (GameObject*)questGiver, pQuest);
             break;
     }
