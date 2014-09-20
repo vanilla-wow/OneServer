@@ -12,9 +12,7 @@
 #include "ElunaTemplate.h"
 #include "ElunaUtility.h"
 
-// Some dummy includes containing BOOST_VERSION:
-// ObjectAccessor.h Config.h Log.h
-#ifdef BOOST_VERSION
+#ifdef USING_BOOST
 #include <boost/filesystem.hpp>
 #else
 #include <ace/ACE.h>
@@ -73,6 +71,9 @@ void Eluna::ReloadEluna()
     Uninitialize();
     Initialize();
 
+    // in multithread foreach: run scripts
+    sEluna->RunScripts();
+
 #ifdef TRINITY
     // Re initialize creature AI restoring C++ AI or applying lua AI
     {
@@ -89,13 +90,14 @@ void Eluna::ReloadEluna()
 Eluna::Eluna():
 L(luaL_newstate()),
 
-m_EventMgr(new EventMgr(*this)),
+eventMgr(NULL),
 
 ServerEventBindings(new EventBind<HookMgr::ServerEvents>("ServerEvents", *this)),
 PlayerEventBindings(new EventBind<HookMgr::PlayerEvents>("PlayerEvents", *this)),
 GuildEventBindings(new EventBind<HookMgr::GuildEvents>("GuildEvents", *this)),
 GroupEventBindings(new EventBind<HookMgr::GroupEvents>("GroupEvents", *this)),
 VehicleEventBindings(new EventBind<HookMgr::VehicleEvents>("VehicleEvents", *this)),
+BGEventBindings(new EventBind<HookMgr::BGEvents>("BGEvents", *this)),
 
 PacketEventBindings(new EntryBind<HookMgr::PacketEvents>("PacketEvents", *this)),
 CreatureEventBindings(new EntryBind<HookMgr::CreatureEvents>("CreatureEvents", *this)),
@@ -122,15 +124,16 @@ playerGossipBindings(new EntryBind<HookMgr::GossipEvents>("GossipEvents (player)
     ASSERT(!Eluna::GEluna);
     Eluna::GEluna = this;
 
-    // run scripts
-    RunScripts();
+    // Set event manager. Must be after setting sEluna
+    eventMgr = new EventMgr();
+    eventMgr->globalProcessor = new ElunaEventProcessor(NULL);
 }
 
 Eluna::~Eluna()
 {
     OnLuaStateClose();
 
-    delete m_EventMgr;
+    delete eventMgr;
 
     // Replace this with map remove if making multithread version
     Eluna::GEluna = NULL;
@@ -149,6 +152,7 @@ Eluna::~Eluna()
     delete ItemEventBindings;
     delete ItemGossipBindings;
     delete playerGossipBindings;
+    delete BGEventBindings;
 
     // Must close lua state after deleting stores and mgr
     lua_close(L);
@@ -188,7 +192,7 @@ void Eluna::GetScripts(std::string path, ScriptList& scripts)
 {
     ELUNA_LOG_DEBUG("[Eluna]: GetScripts from path `%s`", path.c_str());
 
-#ifdef BOOST_VERSION
+#ifdef USING_BOOST
     boost::filesystem::path someDir(path);
     boost::filesystem::directory_iterator end_iter;
 
@@ -298,6 +302,8 @@ void Eluna::RunScripts()
     lua_pop(L, 2);
 
     ELUNA_LOG_INFO("[Eluna]: Executed %u Lua scripts in %u ms", count, ElunaUtil::GetTimeDiff(oldMSTime));
+
+    OnLuaStateOpen();
 }
 
 void Eluna::RemoveRef(const void* obj)
@@ -651,6 +657,14 @@ void Eluna::Register(uint8 regtype, uint32 id, uint32 evt, int functionRef)
         if (evt < HookMgr::VEHICLE_EVENT_COUNT)
         {
             VehicleEventBindings->Insert(evt, functionRef);
+            return;
+        }
+        break;
+
+    case HookMgr::REGTYPE_BG:
+        if (evt < HookMgr::BG_EVENT_COUNT)
+        {
+            BGEventBindings->Insert(evt, functionRef);
             return;
         }
         break;
