@@ -7555,12 +7555,18 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
             if (mtype == MOVE_RUN)
                 data << uint8(0);                           // new 2.1.0
             data << float(GetSpeed(mtype));
-            ((Player*)this)->GetSession()->SendPacket(&data);
+            SendMessageToSet(&data, true);
         }
-        WorldPacket data(Opcodes(SetSpeed2Opc_table[mtype][1]), 12);
-        data << GetPackGUID();
-        data << float(GetSpeed(mtype));
-        SendMessageToSet(&data, false);
+        else
+        {
+            m_movementInfo.UpdateTime(WorldTimer::getMSTime());
+
+            WorldPacket data(Opcodes(SetSpeed2Opc_table[mtype][0]), 64);
+            data << GetPackGUID();
+            data << m_movementInfo;
+            data << float(GetSpeed(mtype));
+            SendMessageToSet(&data, true);
+        }
     }
 
     CallForAllControlledUnits(SetSpeedRateHelper(mtype, forced), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET);
