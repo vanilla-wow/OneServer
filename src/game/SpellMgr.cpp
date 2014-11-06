@@ -1919,6 +1919,136 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     if ((spellInfo_1->Id == 39400 && spellInfo_2->Id == 32261) ||
                             (spellInfo_2->Id == 39400 && spellInfo_1->Id == 32261))
                         return false;
+
+                    // Horseman's Whirlwind and Headless Horseman Climax - Body Regen
+                    if ((spellInfo_1->Id == 43116 && spellInfo_2->Id == 42556) ||
+                            (spellInfo_2->Id == 43116 && spellInfo_1->Id == 42556))
+                        return false;
+
+                    // Horseman's Whirlwind and Headless Horseman Climax - Body Regen (transform)
+                    if ((spellInfo_1->Id == 43116 && spellInfo_2->Id == 42403) ||
+                            (spellInfo_2->Id == 43116 && spellInfo_1->Id == 42403))
+                        return false;
+
+                    // Horseman's Whirlwind - Headless Horseman Climax - Body Regen (confused)
+                    if ((spellInfo_1->Id == 43116 && spellInfo_2->Id == 43105) ||
+                            (spellInfo_2->Id == 43116 && spellInfo_1->Id == 43105))
+                        return false;
+
+                    // Headless Horseman Climax - Body Regen and Headless Horseman Climax (transform) - Body Regen
+                    if ((spellInfo_1->Id == 42556 && spellInfo_2->Id == 42403) ||
+                            (spellInfo_2->Id == 42556 && spellInfo_1->Id == 42403))
+                        return false;
+
+                    // Headless Horseman Climax - Body Regen and Headless Horseman Climax (confused) - Body Regen
+                    if ((spellInfo_1->Id == 42556 && spellInfo_2->Id == 43105) ||
+                            (spellInfo_2->Id == 42556 && spellInfo_1->Id == 43105))
+                        return false;
+
+                    // Headless Horseman Climax - Headless Horseman Climax - Body Regen (confused)
+                    if ((spellInfo_1->Id == 42403 && spellInfo_2->Id == 43105) ||
+                            (spellInfo_2->Id == 42403 && spellInfo_1->Id == 43105))
+                        return false;
+
+                    // Headless Horseman Climax - Head Visual and Headless Horseman Climax, Body Stage 1
+                    if ((spellInfo_1->Id == 42413 && spellInfo_2->Id == 42547) ||
+                            (spellInfo_2->Id == 42413 && spellInfo_1->Id == 42547))
+                        return false;
+
+                    // Headless Horseman Climax - Head Visual and Headless Horseman Climax, Body Stage 2
+                    if ((spellInfo_1->Id == 42413 && spellInfo_2->Id == 42548) ||
+                            (spellInfo_2->Id == 42413 && spellInfo_1->Id == 42548))
+                        return false;
+
+                    // Headless Horseman Climax - Head Visual and Headless Horseman Climax, Body Stage 3
+                    if ((spellInfo_1->Id == 42413 && spellInfo_2->Id == 42549) ||
+                            (spellInfo_2->Id == 42413 && spellInfo_1->Id == 42549))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 1 and Headless Horseman Climax - Horseman's Whirlwind
+                    if ((spellInfo_1->Id == 42547 && spellInfo_2->Id == 43116) ||
+                            (spellInfo_2->Id == 42547 && spellInfo_1->Id == 43116))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 1 and Headless Horseman Climax - Body Regen (removed on death)
+                    if ((spellInfo_1->Id == 42547 && spellInfo_2->Id == 42556) ||
+                            (spellInfo_2->Id == 42547 && spellInfo_1->Id == 42556))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 1 and Headless Horseman Climax - Body Regen
+                    if ((spellInfo_1->Id == 42547 && spellInfo_2->Id == 42403) ||
+                            (spellInfo_2->Id == 42547 && spellInfo_1->Id == 42403))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 1 and Headless Horseman Climax - Body Regen (confuse only - removed on death)
+                    if ((spellInfo_1->Id == 42547 && spellInfo_2->Id == 43105) ||
+                            (spellInfo_2->Id == 42547 && spellInfo_1->Id == 43105))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 2 and Headless Horseman Climax - Horseman's Whirlwind
+                    if ((spellInfo_1->Id == 42548 && spellInfo_2->Id == 43116) ||
+                            (spellInfo_2->Id == 42548 && spellInfo_1->Id == 43116))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 2 and Headless Horseman Climax - Body Regen (removed on death)
+                    if ((spellInfo_1->Id == 42548 && spellInfo_2->Id == 42556) ||
+                            (spellInfo_2->Id == 42548 && spellInfo_1->Id == 42556))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 2 and Headless Horseman Climax - Body Regen
+                    if ((spellInfo_1->Id == 42548 && spellInfo_2->Id == 42403) ||
+                            (spellInfo_2->Id == 42548 && spellInfo_1->Id == 42403))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 2 and Headless Horseman Climax - Body Regen (confuse only - removed on death)
+                    if ((spellInfo_1->Id == 42548 && spellInfo_2->Id == 43105) ||
+                            (spellInfo_2->Id == 42548 && spellInfo_1->Id == 43105))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 3 and Headless Horseman Climax - Horseman's Whirlwind
+                    if ((spellInfo_1->Id == 42549 && spellInfo_2->Id == 43116) ||
+                            (spellInfo_2->Id == 42549 && spellInfo_1->Id == 43116))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 3 and Headless Horseman Climax - Body Regen (removed on death)
+                    if ((spellInfo_1->Id == 42549 && spellInfo_2->Id == 42556) ||
+                            (spellInfo_2->Id == 42549 && spellInfo_1->Id == 42556))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 3 and Headless Horseman Climax - Body Regen
+                    if ((spellInfo_1->Id == 42549 && spellInfo_2->Id == 42403) ||
+                            (spellInfo_2->Id == 42549 && spellInfo_1->Id == 42403))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 3 and Headless Horseman Climax - Body Regen (confuse only - removed on death)
+                    if ((spellInfo_1->Id == 42549 && spellInfo_2->Id == 43105) ||
+                            (spellInfo_2->Id == 42549 && spellInfo_1->Id == 43105))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 3 and Summon Pumpkin Burst Delay
+                    if ((spellInfo_1->Id == 42549 && spellInfo_2->Id == 52236) ||
+                            (spellInfo_2->Id == 42549 && spellInfo_1->Id == 52236))
+                        return false;
+
+                    // Headless Horseman Climax, Body Stage 3 and Horseman's Summon
+                    if ((spellInfo_1->Id == 42549 && spellInfo_2->Id == 42394) ||
+                            (spellInfo_2->Id == 42549 && spellInfo_1->Id == 42394))
+                        return false;
+
+                    // Headless Horseman Climax - Head Visual and Summon Pumpkin Burst Delay
+                    if ((spellInfo_1->Id == 42413 && spellInfo_2->Id == 52236) ||
+                            (spellInfo_2->Id == 42413 && spellInfo_1->Id == 52236))
+                        return false;
+
+                    // Headless Horseman Climax - Head Visual and Horseman's Summon
+                    if ((spellInfo_1->Id == 42413 && spellInfo_2->Id == 42394) ||
+                            (spellInfo_2->Id == 42413 && spellInfo_1->Id == 42394))
+                        return false;
+
+                    // Pumpkin Life Cycle and Headless Horseman - Pumpkin Aura
+                    if ((spellInfo_1->Id == 42280 && spellInfo_2->Id == 42294) ||
+                            (spellInfo_2->Id == 42280 && spellInfo_1->Id == 42294))
+                        return false;
                     break;
                 }
                 case SPELLFAMILY_MAGE:
