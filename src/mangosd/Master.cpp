@@ -453,6 +453,13 @@ bool Master::_StartDB()
         return false;
     }
 
+    if (!WorldDatabase.CheckRequiredField("develop_db_version", REVISION_DB_DEVELOP))
+    {
+        ///- Wait for already started DB delay threads to end
+        WorldDatabase.HaltDelayThread();
+        return false;
+    }
+
     dbstring = sConfig.GetStringDefault("CharacterDatabaseInfo", "");
     nConnections = sConfig.GetIntDefault("CharacterDatabaseConnections", 1);
     if (dbstring.empty())

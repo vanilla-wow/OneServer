@@ -1,3 +1,5 @@
+ALTER TABLE develop_db_version CHANGE COLUMN required_dev_0001_01_mangos_develop_db_version required_dev_0002_01_mangos_spell_affect BIT;
+
 DELETE FROM `spell_affect` WHERE `entry` = 36563;
 
 INSERT INTO `spell_affect` (`entry`, `effectId`, `SpellFamilyMask`) VALUES
