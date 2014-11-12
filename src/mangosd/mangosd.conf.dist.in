@@ -861,6 +861,29 @@ AllowTwoSide.AddFriend = 0
 TalentsInspecting = 1
 
 ###################################################################################################################
+# AUTO BROADCAST
+#
+#    AutoBroadcast.On
+#        Enable auto broadcast
+#        Default: 0 - off
+#                 1 - on
+#
+#    AutoBroadcast.Center
+#        Display method
+#        Default: 0 - announce
+#                 1 - notify
+#                 2 - both
+#
+#    AutoBroadcast.Timer
+#        Timer for auto broadcast
+#
+###################################################################################################################
+
+AutoBroadcast.On = 0
+AutoBroadcast.Center = 0
+AutoBroadcast.Timer = 60000
+
+###################################################################################################################
 # CREATURE AND GAMEOBJECT SETTINGS
 #
 #    ThreatRadius
@@ -1123,6 +1146,13 @@ Channel.SilentlyGMJoin = 0
 #        Default: 37800 (50% Transparency)
 #                 0 (Disabled)
 #
+#    GM.ChatColor.Enabled
+#        Default: 0 (disable)
+#                 1 (enable)
+#
+#    GM.ChatColor
+#        Default: "|cff2998ff"
+#
 ###################################################################################################################
 
 GM.LoginState            = 2
@@ -1136,6 +1166,8 @@ GM.LogTrade              = 1
 GM.StartLevel            = 1
 GM.LowerSecurity         = 0
 GM.InvisibleAura         = 37800
+GM.ChatColor.Enabled     = 0
+GM.ChatColor             = "|cff2998ff"
 
 ###################################################################################################################
 # VISIBILITY AND RADIUSES

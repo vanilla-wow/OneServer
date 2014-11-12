@@ -73,6 +73,7 @@ struct InstanceTemplate
     uint32 levelMax;
     uint32 maxPlayers;
     uint32 reset_delay;                                     // in days
+    bool allowMount;
     uint32 script_id;
 };
 
