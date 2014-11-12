@@ -453,7 +453,7 @@ bool Master::_StartDB()
         return false;
     }
 
-    if (!WorldDatabase.CheckRequiredField("develop_db_version", REVISION_DB_DEVELOP))
+    if (!WorldDatabase.CheckRequiredField("dev_db_version", REVISION_DB_MANGOS_DEV))
     {
         ///- Wait for already started DB delay threads to end
         WorldDatabase.HaltDelayThread();
@@ -490,6 +490,14 @@ bool Master::_StartDB()
         return false;
     }
 
+    if (!CharacterDatabase.CheckRequiredField("character_dev_db_version", REVISION_DB_CHARACTERS_DEV))
+    {
+        ///- Wait for already started DB delay threads to end
+        WorldDatabase.HaltDelayThread();
+        CharacterDatabase.HaltDelayThread();
+        return false;
+    }
+
     ///- Get login database info from configuration file
     dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
     nConnections = sConfig.GetIntDefault("LoginDatabaseConnections", 1);
@@ -516,6 +524,15 @@ bool Master::_StartDB()
     }
 
     if (!LoginDatabase.CheckRequiredField("realmd_db_version", REVISION_DB_REALMD))
+    {
+        ///- Wait for already started DB delay threads to end
+        WorldDatabase.HaltDelayThread();
+        CharacterDatabase.HaltDelayThread();
+        LoginDatabase.HaltDelayThread();
+        return false;
+    }
+
+    if (!LoginDatabase.CheckRequiredField("realmd_dev_db_version", REVISION_DB_REALMD_DEV))
     {
         ///- Wait for already started DB delay threads to end
         WorldDatabase.HaltDelayThread();
