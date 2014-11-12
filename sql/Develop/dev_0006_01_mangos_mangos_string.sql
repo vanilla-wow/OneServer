@@ -1,4 +1,4 @@
-ALTER TABLE develop_db_version CHANGE COLUMN required_dev_0005_01_mangos_mangos_string required_dev_0006_01_mangos_mangos_string BIT;
+ALTER TABLE dev_db_version CHANGE COLUMN required_dev_0005_01_mangos_mangos_string required_dev_0006_01_mangos_mangos_string BIT;
 
 DELETE FROM `mangos_string` WHERE entry IN (67, 68, 69);
 INSERT INTO `mangos_string` VALUES

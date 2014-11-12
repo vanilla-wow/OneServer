@@ -1,4 +1,4 @@
-ALTER TABLE develop_db_version CHANGE COLUMN required_dev_0004_01_mangos_dev_db_version required_dev_0005_01_mangos_mangos_string BIT;
+ALTER TABLE dev_db_version CHANGE COLUMN required_dev_0004_01_mangos_dev_db_version required_dev_0005_01_mangos_mangos_string BIT;
 
 DELETE FROM `mangos_string` WHERE `entry` = 1700;
 

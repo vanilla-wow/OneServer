@@ -1,4 +1,4 @@
-ALTER TABLE develop_db_version CHANGE COLUMN required_dev_0006_01_mangos_mangos_string required_dev_0006_02_mangos_command BIT;
+ALTER TABLE dev_db_version CHANGE COLUMN required_dev_0006_01_mangos_mangos_string required_dev_0006_02_mangos_command BIT;
 
 DELETE FROM `command` WHERE NAME = 'nameannounce';
 INSERT INTO `command` VALUES
