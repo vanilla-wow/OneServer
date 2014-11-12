@@ -167,17 +167,19 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         GetPlayer()->m_taxi.ClearTaxiDestinations();
     }
 
-    if (mEntry->IsRaid() && mInstance)
+    bool allowMount = !mEntry->IsDungeon()  || mEntry->IsBattleGroundOrArena();
+    if (mInstance)
     {
         if (time_t timeReset = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(mEntry->MapID))
         {
             uint32 timeleft = uint32(timeReset - time(NULL));
             GetPlayer()->SendInstanceResetWarning(mEntry->MapID, timeleft);
         }
+        allowMount = mInstance->allowMount;
     }
 
     // mount allow check
-    if (!mEntry->IsMountAllowed())
+    if (!allowMount)
         _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     // honorless target
