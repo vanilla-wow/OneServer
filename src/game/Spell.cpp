@@ -3429,6 +3429,10 @@ void Spell::SendSpellGo()
 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
 
+    // triggered spells with spell visual != 0
+    if (m_IsTriggeredSpell || m_triggeredByAuraSpell)
+        castFlags |= CAST_FLAG_HIDDEN_COMBATLOG;
+
     uint32 castFlags = CAST_FLAG_UNKNOWN9;
     if (IsRangedSpell())
         castFlags |= CAST_FLAG_AMMO;                        // arrows/bullets visual
