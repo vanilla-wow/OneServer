@@ -1435,7 +1435,7 @@ namespace LuaGlobalFunctions
                 creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), phase);
 
                 uint32 db_lowguid = creature->GetDBTableGUIDLow();
-                if (!creaturLoadCreatureFromDB(db_lowguid, map))
+                if (!creature->LoadCreatureFromDB(db_lowguid, map))
                 {
                     delete creature;
                     Eluna::Push(L);
@@ -2253,6 +2253,72 @@ namespace LuaGlobalFunctions
 
         Eluna::Push(L, Player::IsBagPos((bag << 8) + slot));
         return 1;
+    }
+
+    /**
+     * Returns current time in ms
+     *
+     * @return uint32 currTime
+     */
+    int GetCurrTime(Eluna* /*E*/, lua_State* L)
+    {
+        Eluna::Push(L, ElunaUtil::GetCurrTime());
+        return 1;
+    }
+
+    /**
+     * Returns difference from a [Global:GetCurrTime] time to now
+     *
+     * @param uint32 oldTime
+     * @return uint32 timeDiff
+     */
+    int GetTimeDiff(Eluna* /*E*/, lua_State* L)
+    {
+        uint32 oldtimems = Eluna::CHECKVAL<uint32>(L, 1);
+
+        Eluna::Push(L, ElunaUtil::GetTimeDiff(oldtimems));
+        return 1;
+    }
+
+    std::string GetStackAsString(lua_State* L)
+    {
+        std::ostringstream oss;
+        for (int i = 1; i <= lua_gettop(L); ++i)
+            oss << luaL_tolstring(L, i, NULL);
+        return oss.str();
+    }
+
+    /**
+     * Prints given parameters to the info log
+     *
+     * @param ... variableArguments
+     */
+    int PrintInfo(Eluna* /*E*/, lua_State* L)
+    {
+        ELUNA_LOG_INFO("%s", GetStackAsString(L).c_str());
+        return 0;
+    }
+
+    /**
+     * Prints given parameters to the error log
+     *
+     * @param ... variableArguments
+     */
+    int PrintError(Eluna* /*E*/, lua_State* L)
+    {
+        ELUNA_LOG_ERROR("%s", GetStackAsString(L).c_str());
+        return 0;
+    }
+
+    /**
+     * Prints given parameters to the debug log
+     *
+     * @param ... variableArguments
+     */
+    int PrintDebug(Eluna* /*E*/, lua_State* L)
+    {
+        ELUNA_LOG_DEBUG("%s", GetStackAsString(L).c_str());
+        return 0;
     }
 }
 #endif
