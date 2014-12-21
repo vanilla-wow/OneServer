@@ -529,5 +529,5 @@ if(PCH)
   endif()
 endif()
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/masterscript.lua DESTINATION ${BIN_DIR}/lua_scripts/)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/masterscript.lua DESTINATION ${BIN_DIR}/lua_scripts/)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/extensions DESTINATION ${BIN_DIR}/lua_scripts/)
