@@ -176,7 +176,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
-               copy ..\..\src\game\LuaEngine\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
+               copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|X64'">
@@ -215,7 +215,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
-               copy ..\..\src\game\LuaEngine\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
+               copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -250,7 +250,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
-               copy ..\..\src\game\LuaEngine\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
+               copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|X64'">
@@ -289,7 +289,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
-               copy ..\..\src\game\LuaEngine\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
+               copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoPCH|Win32'">
@@ -324,7 +324,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
-               copy ..\..\src\game\LuaEngine\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
+               copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoPCH|X64'">
@@ -363,7 +363,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
-               copy ..\..\src\game\LuaEngine\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
+               copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
