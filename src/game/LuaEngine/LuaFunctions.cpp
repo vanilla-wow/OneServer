@@ -55,6 +55,20 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "RegisterPlayerGossipEvent", &LuaGlobalFunctions::RegisterPlayerGossipEvent },           // RegisterPlayerGossipEvent(menu_id, event, function)
     { "RegisterBGEvent", &LuaGlobalFunctions::RegisterBGEvent },                               // RegisterBGEvent(event, function)
 
+    { "ClearBattleGroundEvents", &LuaGlobalFunctions::ClearBattleGroundEvents },
+    { "ClearCreatureEvents", &LuaGlobalFunctions::ClearCreatureEvents },
+    { "ClearCreatureGossipEvents", &LuaGlobalFunctions::ClearCreatureGossipEvents },
+    { "ClearGameObjectEvents", &LuaGlobalFunctions::ClearGameObjectEvents },
+    { "ClearGameObjectGossipEvents", &LuaGlobalFunctions::ClearGameObjectGossipEvents },
+    { "ClearGroupEvents", &LuaGlobalFunctions::ClearGroupEvents },
+    { "ClearGuildEvents", &LuaGlobalFunctions::ClearGuildEvents },
+    { "ClearItemEvents", &LuaGlobalFunctions::ClearItemEvents },
+    { "ClearItemGossipEvents", &LuaGlobalFunctions::ClearItemGossipEvents },
+    { "ClearPacketEvents", &LuaGlobalFunctions::ClearPacketEvents },
+    { "ClearPlayerEvents", &LuaGlobalFunctions::ClearPlayerEvents },
+    { "ClearPlayerGossipEvents", &LuaGlobalFunctions::ClearPlayerGossipEvents },
+    { "ClearServerEvents", &LuaGlobalFunctions::ClearServerEvents },
+
     // Getters
     { "GetLuaEngine", &LuaGlobalFunctions::GetLuaEngine },
     { "GetCoreName", &LuaGlobalFunctions::GetCoreName },
@@ -285,9 +299,9 @@ ElunaRegister<Unit> UnitMethods[] =
 #endif
     { "SetSpeed", &LuaUnit::SetSpeed },                       // :SetSpeed(type, speed[, forced]) - Sets speed for the movement type (0 = walk, 1 = run ..)
     // {"SetStunned", &LuaUnit::SetStunned},                // :SetStunned([enable]) - Stuns or removes stun
-    // {"SetRooted", &LuaUnit::SetRooted},                  // :SetRooted([enable]) - Roots or removes root
-    // {"SetConfused", &LuaUnit::SetConfused},              // :SetConfused([enable]) - Sets confused or removes confusion
-    // {"SetFeared", &LuaUnit::SetFeared},                  // :SetFeared([enable]) - Fears or removes fear
+    {"SetRooted", &LuaUnit::SetRooted},                       // :SetRooted([enable]) - Roots or removes root
+    {"SetConfused", &LuaUnit::SetConfused},                   // :SetConfused([enable]) - Sets confused or removes confusion
+    {"SetFeared", &LuaUnit::SetFeared},                       // :SetFeared([enable]) - Fears or removes fear
     { "SetPvP", &LuaUnit::SetPvP },                           // :SetPvP([apply]) - Sets the units PvP on or off
 #if (!defined(TBC) && !defined(CLASSIC))
     { "SetFFA", &LuaUnit::SetFFA },                           // :SetFFA([apply]) - Sets the units FFA tag on or off
