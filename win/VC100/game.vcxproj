@@ -176,6 +176,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
+               copy ..\..\src\game\Custom\custom.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
                copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -215,6 +216,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
+               copy ..\..\src\game\Custom\custom.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
                copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -250,6 +252,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
+               copy ..\..\src\game\Custom\custom.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
                copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -289,6 +292,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
+               copy ..\..\src\game\Custom\custom.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
                copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -324,6 +328,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
+               copy ..\..\src\game\Custom\custom.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
                copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -363,6 +368,7 @@
     <PostBuildEvent>
       <Command>XCOPY "..\..\src\game\LuaEngine\extensions" "..\..\bin\$(Platform)_$(Configuration)/lua_scripts\extensions" /E /I /F /Y
                copy ..\..\src\game\AuctionHouseBot\ahbot.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
+               copy ..\..\src\game\Custom\custom.conf.dist.in ..\..\bin\$(Platform)_$(Configuration)
                copy ..\..\src\game\LuaEngine\scripts\masterscript.lua ..\..\bin\$(Platform)_$(Configuration)/lua_scripts</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -540,6 +546,7 @@
     <ClCompile Include="..\..\src\game\vmap\VMapFactory.cpp" />
     <ClCompile Include="..\..\src\game\vmap\VMapManager2.cpp" />
     <ClCompile Include="..\..\src\game\vmap\WorldModel.cpp" />
+    <ClCompile Include="..\..\src\game\Custom\Custom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game\AccountMgr.h" />
@@ -728,6 +735,7 @@
     <ClInclude Include="..\..\src\game\vmap\VMapManager2.h" />
     <ClInclude Include="..\..\src\game\vmap\VMapTools.h" />
     <ClInclude Include="..\..\src\game\vmap\WorldModel.h" />
+    <ClCompile Include="..\..\src\game\Custom\Custom.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\dep\recastnavigation\Detour\win\VC100\Detour.vcxproj">

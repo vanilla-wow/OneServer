@@ -43,6 +43,9 @@
     <Filter Include="LuaEngine\Methods">
       <UniqueIdentifier>{ee816624-bdb0-47a5-8efc-f127b827f609}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Custom">
+      <UniqueIdentifier>{39c05690-8916-4f2f-b9d9-cf78f44f3705}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\game\AccountMgr.cpp">
@@ -546,6 +549,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\game\TransportSystem.cpp">
       <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\game\Custom\Custom.cpp">
+      <Filter>Custom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1111,5 +1117,8 @@
     <ClInclude Include="..\..\src\game\LuaEngine\ElunaQueryMethods.h">
       <Filter>LuaEngine\Methods</Filter>
     </ClInclude>
+    <ClCompile Include="..\..\src\game\Custom\Custom.h">
+      <Filter>Custom</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

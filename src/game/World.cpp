@@ -67,6 +67,7 @@
 #include "CharacterDatabaseCleaner.h"
 #include "CreatureLinkingMgr.h"
 #include "LuaEngine.h"
+#include "Custom/Custom.h"
 
 INSTANTIATE_SINGLETON_1(World);
 
@@ -914,6 +915,7 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize config settings
     LoadConfigSettings();
+    sCustom.CustomInit();
 
     ///- Check the existence of the map files for all races start areas.
     if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f) ||                     // Dwarf/ Gnome
