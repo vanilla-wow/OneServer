@@ -1117,8 +1117,8 @@
     <ClInclude Include="..\..\src\game\LuaEngine\HookMgr.h">
       <Filter>LuaEngine</Filter>
     </ClInclude>
-    <ClCompile Include="..\..\src\game\Custom\Custom.h">
+    <ClInclude Include="..\..\src\game\Custom\Custom.h">
       <Filter>Custom</Filter>
-    </ClCompile>
+    </ClInclude>
   </ItemGroup>
 </Project>

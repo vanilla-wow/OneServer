@@ -583,7 +583,7 @@
     <ClInclude Include="..\..\src\game\CreatureEventAI.h" />
     <ClInclude Include="..\..\src\game\CreatureEventAIMgr.h" />
     <ClInclude Include="..\..\src\game\CreatureLinkingMgr.h" />
-    <ClCompile Include="..\..\src\game\Custom\Custom.h" />
+    <ClInclude Include="..\..\src\game\Custom\Custom.h" />
     <ClInclude Include="..\..\src\game\DBCEnums.h" />
     <ClInclude Include="..\..\src\game\DBCfmt.h" />
     <ClInclude Include="..\..\src\game\DBCStores.h" />
