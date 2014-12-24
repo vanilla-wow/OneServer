@@ -42,7 +42,7 @@ enum CustomConfigFloatValues
 
 enum CustomConfigBoolValues
 {
-    CUSTOMCONFIG_BOOL_EMPTY = 0, 
+    CUSTOMCONFIG_BOOL_EMPTY = 0,   // overwrite with new conf
     CUSTOMCONFIG_BOOL_VALUE_COUNT
 };
 
