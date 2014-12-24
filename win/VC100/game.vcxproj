@@ -411,6 +411,7 @@
     <ClCompile Include="..\..\src\game\CreatureEventAI.cpp" />
     <ClCompile Include="..\..\src\game\CreatureEventAIMgr.cpp" />
     <ClCompile Include="..\..\src\game\CreatureLinkingMgr.cpp" />
+    <ClCompile Include="..\..\src\game\Custom\Custom.cpp" />
     <ClCompile Include="..\..\src\game\DBCStores.cpp" />
     <ClCompile Include="..\..\src\game\debugcmds.cpp" />
     <ClCompile Include="..\..\src\game\DuelHandler.cpp" />
@@ -546,7 +547,6 @@
     <ClCompile Include="..\..\src\game\vmap\VMapFactory.cpp" />
     <ClCompile Include="..\..\src\game\vmap\VMapManager2.cpp" />
     <ClCompile Include="..\..\src\game\vmap\WorldModel.cpp" />
-    <ClCompile Include="..\..\src\game\Custom\Custom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game\AccountMgr.h" />
@@ -583,6 +583,7 @@
     <ClInclude Include="..\..\src\game\CreatureEventAI.h" />
     <ClInclude Include="..\..\src\game\CreatureEventAIMgr.h" />
     <ClInclude Include="..\..\src\game\CreatureLinkingMgr.h" />
+    <ClCompile Include="..\..\src\game\Custom\Custom.h" />
     <ClInclude Include="..\..\src\game\DBCEnums.h" />
     <ClInclude Include="..\..\src\game\DBCfmt.h" />
     <ClInclude Include="..\..\src\game\DBCStores.h" />
@@ -735,7 +736,6 @@
     <ClInclude Include="..\..\src\game\vmap\VMapManager2.h" />
     <ClInclude Include="..\..\src\game\vmap\VMapTools.h" />
     <ClInclude Include="..\..\src\game\vmap\WorldModel.h" />
-    <ClCompile Include="..\..\src\game\Custom\Custom.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\dep\recastnavigation\Detour\win\VC100\Detour.vcxproj">
