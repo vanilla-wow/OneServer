@@ -25,6 +25,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/vmap
   ${CMAKE_CURRENT_SOURCE_DIR}/AuctionHouseBot
   ${CMAKE_CURRENT_SOURCE_DIR}/BattleGround
+  ${CMAKE_CURRENT_SOURCE_DIR}/Custom
   ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine
   ${CMAKE_CURRENT_SOURCE_DIR}/OutdoorPvP
   ${CMAKE_CURRENT_SOURCE_DIR}/Warden
@@ -68,6 +69,11 @@ set(SRC_GRP_BATTLEGROUND
     BattleGround/BattleGroundRL.h
     BattleGround/BattleGroundWS.cpp
     BattleGround/BattleGroundWS.h
+)
+
+set(SRC_GRP_CUSTOM
+    Custom/Custom.cpp
+    Custom/Custom.h
 )
 
 file(GLOB SRC_FILES_LUAENGINE LuaEngine/*.cpp LuaEngine/*.h)
@@ -419,6 +425,7 @@ set(SRC_GRP_WORLD_HANDLERS
 set(LIBRARY_SRCS
     ${SRC_GRP_AHBOT}
     ${SRC_GRP_BATTLEGROUND}
+    ${SRC_GRP_CUSTOM}
     ${SRC_GRP_LUAENGINE}
     ${SRC_GRP_CHAT_COMMANDS}
     ${SRC_GRP_MOTION_GEN}
@@ -443,6 +450,11 @@ source_group("AhBot"
 source_group("BattleGround"
   FILES
     ${SRC_GRP_BATTLEGROUND}
+)
+
+source_group("Custom"
+  FILES
+    ${SRC_GRP_CUSTOM}
 )
 
 source_group("LuaEngine"
@@ -549,4 +561,6 @@ if(PCH)
   endif()
 endif()
 
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/scripts/masterscript.lua DESTINATION ${BIN_DIR}/lua_scripts/)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/extensions DESTINATION ${BIN_DIR}/lua_scripts/)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Custom/custom.conf.dist.in DESTINATION ${CONF_DIR})

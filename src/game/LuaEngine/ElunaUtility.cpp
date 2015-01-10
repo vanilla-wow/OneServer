@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010 - 2014 Eluna Lua Engine <http://emudevs.com/>
+* Copyright (C) 2010 - 2015 Eluna Lua Engine <http://emudevs.com/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
 */
@@ -45,8 +45,8 @@ bool ElunaUtil::ObjectDistanceOrderPred::operator()(WorldObject const* pLeft, Wo
 }
 
 ElunaUtil::WorldObjectInRangeCheck::WorldObjectInRangeCheck(bool nearest, WorldObject const* obj, float range,
-    uint16 typeMask, uint32 entry, uint32 hostile) : i_nearest(nearest),
-    i_obj(obj), i_range(range), i_typeMask(typeMask), i_entry(entry), i_hostile(hostile)
+    uint16 typeMask, uint32 entry, uint32 hostile) :
+    i_obj(obj), i_hostile(hostile), i_entry(entry), i_range(range), i_typeMask(typeMask), i_nearest(nearest)
 {
 }
 WorldObject const& ElunaUtil::WorldObjectInRangeCheck::GetFocusObject() const

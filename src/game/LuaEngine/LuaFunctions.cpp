@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010 - 2014 Eluna Lua Engine <http://emudevs.com/>
+* Copyright (C) 2010 - 2015 Eluna Lua Engine <http://emudevs.com/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
 */
@@ -55,6 +55,20 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "RegisterPlayerGossipEvent", &LuaGlobalFunctions::RegisterPlayerGossipEvent },           // RegisterPlayerGossipEvent(menu_id, event, function)
     { "RegisterBGEvent", &LuaGlobalFunctions::RegisterBGEvent },                               // RegisterBGEvent(event, function)
 
+    { "ClearBattleGroundEvents", &LuaGlobalFunctions::ClearBattleGroundEvents },
+    { "ClearCreatureEvents", &LuaGlobalFunctions::ClearCreatureEvents },
+    { "ClearCreatureGossipEvents", &LuaGlobalFunctions::ClearCreatureGossipEvents },
+    { "ClearGameObjectEvents", &LuaGlobalFunctions::ClearGameObjectEvents },
+    { "ClearGameObjectGossipEvents", &LuaGlobalFunctions::ClearGameObjectGossipEvents },
+    { "ClearGroupEvents", &LuaGlobalFunctions::ClearGroupEvents },
+    { "ClearGuildEvents", &LuaGlobalFunctions::ClearGuildEvents },
+    { "ClearItemEvents", &LuaGlobalFunctions::ClearItemEvents },
+    { "ClearItemGossipEvents", &LuaGlobalFunctions::ClearItemGossipEvents },
+    { "ClearPacketEvents", &LuaGlobalFunctions::ClearPacketEvents },
+    { "ClearPlayerEvents", &LuaGlobalFunctions::ClearPlayerEvents },
+    { "ClearPlayerGossipEvents", &LuaGlobalFunctions::ClearPlayerGossipEvents },
+    { "ClearServerEvents", &LuaGlobalFunctions::ClearServerEvents },
+
     // Getters
     { "GetLuaEngine", &LuaGlobalFunctions::GetLuaEngine },
     { "GetCoreName", &LuaGlobalFunctions::GetCoreName },
@@ -85,6 +99,11 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "bit_and", &LuaGlobalFunctions::bit_and },
     { "GetItemLink", &LuaGlobalFunctions::GetItemLink },
     { "GetMapById", &LuaGlobalFunctions::GetMapById },
+    { "GetCurrTime", &LuaGlobalFunctions::GetCurrTime },
+    { "GetTimeDiff", &LuaGlobalFunctions::GetTimeDiff },
+    { "PrintInfo", &LuaGlobalFunctions::PrintInfo },
+    { "PrintError", &LuaGlobalFunctions::PrintError },
+    { "PrintDebug", &LuaGlobalFunctions::PrintDebug },
 
     // Boolean
     { "IsInventoryPos", &LuaGlobalFunctions::IsInventoryPos },
@@ -122,6 +141,8 @@ ElunaGlobal::ElunaRegister GlobalMethods[] =
     { "AddWeather", &LuaGlobalFunctions::AddWeather },
     { "RemoveWeather", &LuaGlobalFunctions::RemoveWeather },
     { "SendFineWeatherToPlayer", &LuaGlobalFunctions::SendFineWeatherToPlayer },
+    { "CreateInt64", &LuaGlobalFunctions::CreateLongLong },
+    { "CreateUint64", &LuaGlobalFunctions::CreateULongLong },
 
     { NULL, NULL },
 };
@@ -144,7 +165,6 @@ ElunaRegister<Object> ObjectMethods[] =
     // Setters
     { "SetInt32Value", &LuaObject::SetInt32Value },           // :SetInt32Value(index, value) - Sets an int value for the object
     { "SetUInt32Value", &LuaObject::SetUInt32Value },         // :SetUInt32Value(index, value) - Sets an uint value for the object
-    { "UpdateUInt32Value", &LuaObject::UpdateUInt32Value },   // :UpdateUInt32Value(index, value) - Updates an uint value for the object
     { "SetFloatValue", &LuaObject::SetFloatValue },           // :SetFloatValue(index, value) - Sets a float value for the object
     { "SetByteValue", &LuaObject::SetByteValue },             // :SetByteValue(index, offset, value) - Sets a byte value for the object
     { "SetUInt16Value", &LuaObject::SetUInt16Value },         // :SetUInt16Value(index, offset, value) - Sets an uint16 value for the object
@@ -240,7 +260,7 @@ ElunaRegister<Unit> UnitMethods[] =
     { "GetUnfriendlyUnitsInRange", &LuaUnit::GetUnfriendlyUnitsInRange }, // :GetUnfriendlyUnitsInRange([range]) - Returns a list of unfriendly units in range, can return nil
     { "GetOwnerGUID", &LuaUnit::GetOwnerGUID },                           // :GetOwnerGUID() - Returns the UNIT_FIELD_SUMMONEDBY owner
     { "GetCreatorGUID", &LuaUnit::GetCreatorGUID },                       // :GetCreatorGUID() - Returns the UNIT_FIELD_CREATEDBY creator
-    { "GetMinionGUID", &LuaUnit::GetMinionGUID },                         // :GetMinionGUID() - Returns the UNIT_FIELD_SUMMON unit's minion GUID
+    { "GetMinionGUID", &LuaUnit::GetPetGUID },                            // :GetMinionGUID() - Decapreted. GetMinionGUID is same as GetPetGUID
     { "GetCharmerGUID", &LuaUnit::GetCharmerGUID },                       // :GetCharmerGUID() - Returns the UNIT_FIELD_CHARMEDBY charmer
     { "GetCharmGUID", &LuaUnit::GetCharmGUID },                           // :GetCharmGUID() - Returns the unit's UNIT_FIELD_CHARM guid
     { "GetPetGUID", &LuaUnit::GetPetGUID },                               // :GetPetGUID() - Returns the unit's pet GUID
@@ -257,6 +277,9 @@ ElunaRegister<Unit> UnitMethods[] =
 #if (!defined(TBC) && !defined(CLASSIC))
     { "GetVehicleKit", &LuaUnit::GetVehicleKit },                         // :GetVehicleKit() - Gets unit's Vehicle kit if the unit is a vehicle
     // {"GetVehicle", &LuaUnit::GetVehicle},                            // :GetVehicle() - Gets the Vehicle kit of the vehicle the unit is on
+#endif
+#ifdef MANGOS
+    { "GetMovementType", &LuaUnit::GetMovementType },
 #endif
 
     // Setters
@@ -276,9 +299,9 @@ ElunaRegister<Unit> UnitMethods[] =
 #endif
     { "SetSpeed", &LuaUnit::SetSpeed },                       // :SetSpeed(type, speed[, forced]) - Sets speed for the movement type (0 = walk, 1 = run ..)
     // {"SetStunned", &LuaUnit::SetStunned},                // :SetStunned([enable]) - Stuns or removes stun
-    // {"SetRooted", &LuaUnit::SetRooted},                  // :SetRooted([enable]) - Roots or removes root
-    // {"SetConfused", &LuaUnit::SetConfused},              // :SetConfused([enable]) - Sets confused or removes confusion
-    // {"SetFeared", &LuaUnit::SetFeared},                  // :SetFeared([enable]) - Fears or removes fear
+    {"SetRooted", &LuaUnit::SetRooted},                       // :SetRooted([enable]) - Roots or removes root
+    {"SetConfused", &LuaUnit::SetConfused},                   // :SetConfused([enable]) - Sets confused or removes confusion
+    {"SetFeared", &LuaUnit::SetFeared},                       // :SetFeared([enable]) - Fears or removes fear
     { "SetPvP", &LuaUnit::SetPvP },                           // :SetPvP([apply]) - Sets the units PvP on or off
 #if (!defined(TBC) && !defined(CLASSIC))
     { "SetFFA", &LuaUnit::SetFFA },                           // :SetFFA([apply]) - Sets the units FFA tag on or off
@@ -290,7 +313,7 @@ ElunaRegister<Unit> UnitMethods[] =
     { "SetName", &LuaUnit::SetName },                         // :SetName(name) - Sets the unit's name
     { "SetSheath", &LuaUnit::SetSheath },                     // :SetSheath(SheathState) - Sets unit's sheathstate
     { "SetCreatorGUID", &LuaUnit::SetCreatorGUID },           // :SetOwnerGUID(uint64 ownerGUID) - Sets the owner's guid of a summoned creature, etc
-    { "SetMinionGUID", &LuaUnit::SetMinionGUID },             // :SetCreatorGUID(uint64 creatorGUID) - Sets the UNIT_FIELD_CREATEDBY creator's guid
+    { "SetMinionGUID", &LuaUnit::SetPetGUID },                // Decapreted. Same as SetPetGUID
     { "SetCharmerGUID", &LuaUnit::SetCharmerGUID },           // :SetCharmerGUID(uint64 ownerGUID) - Sets the UNIT_FIELD_CHARMEDBY charmer GUID
     { "SetPetGUID", &LuaUnit::SetPetGUID },                   // :SetPetGUID(uint64 guid) - Sets the pet's guid
 #if (!defined(TBC) && !defined(CLASSIC))
@@ -424,8 +447,9 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetLevelPlayedTime", &LuaPlayer::GetLevelPlayedTime },                     // :GetLevelPlayedTime() - Returns the player's played time at that level
     { "GetTotalPlayedTime", &LuaPlayer::GetTotalPlayedTime },                     // :GetTotalPlayedTime() - Returns the total played time of that player
     { "GetItemByPos", &LuaPlayer::GetItemByPos },                                 // :GetItemByPos(bag, slot) - Returns item in given slot in a bag (bag: 19-22 slot: 0-35) or inventory (bag: 255 slot : 0-38)
-    { "GetReputation", &LuaPlayer::GetReputation },                               // :GetReputation(faction) - Gets player's reputation with given faction
     { "GetItemByEntry", &LuaPlayer::GetItemByEntry },                             // :GetItemByEntry(entry) - Gets an item if the player has it
+    { "GetItemByGUID", &LuaPlayer::GetItemByGUID },
+    { "GetReputation", &LuaPlayer::GetReputation },                               // :GetReputation(faction) - Gets player's reputation with given faction
     { "GetEquippedItemBySlot", &LuaPlayer::GetEquippedItemBySlot },               // :GetEquippedItemBySlot(slotId) - Returns equipped item by slot
     { "GetQuestLevel", &LuaPlayer::GetQuestLevel },                               // :GetQuestLevel(quest) - Returns quest's level
     { "GetChatTag", &LuaPlayer::GetChatTag },                                     // :GetChatTag() - Returns player chat tag ID
@@ -697,7 +721,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "SendTaxiMenu", &LuaPlayer::SendTaxiMenu },                                         // :SendTaxiMenu(creature) - Sends flight window to player from creature
     { "RewardQuest", &LuaPlayer::RewardQuest },                                           // :RewardQuest(entry) - Gives quest rewards for the player
     { "SendAuctionMenu", &LuaPlayer::SendAuctionMenu },                                   // :SendAuctionMenu(unit) - Sends auction window to player. Auction house is sent by object.
-    { "SendShowMailBox", &LuaPlayer::SendShowMailBox },                                   // :SendShowMailBox([guid]) - Sends mail window to player. Sent by guid if provided (valid mailbox required for < wotlk)
+    { "SendShowMailBox", &LuaPlayer::SendShowMailBox },                                   // :SendShowMailBox([mailboxguid]) - Sends the mail window to player from the mailbox gameobject. The guid is required on patches below wotlk.
     { "StartTaxi", &LuaPlayer::StartTaxi },                                               // :StartTaxi(pathId) - player starts the given flight path
     { "GossipSendPOI", &LuaPlayer::GossipSendPOI },                                       // :GossipSendPOI(X, Y, Icon, Flags, Data, Name) - Sends a point of interest to the player
     { "GossipAddQuests", &LuaPlayer::GossipAddQuests },                                   // :GossipAddQuests(unit) - Adds unit's quests to player's gossip menu
@@ -1113,7 +1137,6 @@ ElunaRegister<ElunaQuery> QueryMethods[] =
     { "GetFloat", &LuaQuery::GetFloat },                      // :GetFloat(column) - returns the value of a float column
     { "GetDouble", &LuaQuery::GetDouble },                    // :GetDouble(column) - returns the value of a double column
     { "GetString", &LuaQuery::GetString },                    // :GetString(column) - returns the value of a string column, always returns a string
-    { "GetCString", &LuaQuery::GetCString },                  // :GetCString(column) - returns the value of a string column, can return nil
     { "IsNull", &LuaQuery::IsNull },                          // :IsNull(column) - returns true if the column is null
 
     { NULL, NULL },
@@ -1246,21 +1269,66 @@ ElunaRegister<BattleGround> BattleGroundMethods[] =
 
 template<typename T> const char* ElunaTemplate<T>::tname = NULL;
 template<typename T> bool ElunaTemplate<T>::manageMemory = false;
+
 #if (!defined(TBC) && !defined(CLASSIC))
 // fix compile error about accessing vehicle destructor
-template<> int ElunaTemplate<Vehicle>::gcT(lua_State* L)
+template<> int ElunaTemplate<Vehicle>::CollectGarbage(lua_State* L)
 {
     ASSERT(!manageMemory);
 
     // Get object pointer (and check type, no error)
-    ElunaObject** ptrHold = static_cast<ElunaObject**>(luaL_testudata(L, -1, tname));
-    if (ptrHold)
-    {
-        delete *ptrHold;
-    }
+    ElunaObject* obj = Eluna::CHECKOBJ<ElunaObject>(L, 1, false);
+    delete obj;
     return 0;
 }
 #endif
+
+// Template by Mud from http://stackoverflow.com/questions/4484437/lua-integer-type/4485511#4485511
+template<> int ElunaTemplate<unsigned long long>::Add(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) + Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Substract(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) - Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Multiply(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) * Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Divide(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) / Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Mod(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) % Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+// template<> int ElunaTemplate<unsigned long long>::UnaryMinus(lua_State* L) { Eluna::Push(L, -Eluna::CHECKVAL<unsigned long long>(L, 1)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Equal(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) == Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Less(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) < Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::LessOrEqual(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<unsigned long long>(L, 1) <= Eluna::CHECKVAL<unsigned long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<unsigned long long>::Pow(lua_State* L)
+{
+    Eluna::Push(L, static_cast<unsigned long long>(powl(static_cast<long double>(Eluna::CHECKVAL<unsigned long long>(L, 1)), static_cast<long double>(Eluna::CHECKVAL<unsigned long long>(L, 2)))));
+    return 1;
+}
+template<> int ElunaTemplate<unsigned long long>::ToString(lua_State* L)
+{
+    unsigned long long l = Eluna::CHECKVAL<unsigned long long>(L, 1);
+    std::ostringstream ss;
+    ss << l;
+    Eluna::Push(L, ss.str());
+    return 1;
+}
+
+template<> int ElunaTemplate<long long>::Add(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) + Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Substract(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) - Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Multiply(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) * Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Divide(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) / Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Mod(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) % Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::UnaryMinus(lua_State* L) { Eluna::Push(L, -Eluna::CHECKVAL<long long>(L, 1)); return 1; }
+template<> int ElunaTemplate<long long>::Equal(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) == Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Less(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) < Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::LessOrEqual(lua_State* L) { Eluna::Push(L, Eluna::CHECKVAL<long long>(L, 1) <= Eluna::CHECKVAL<long long>(L, 2)); return 1; }
+template<> int ElunaTemplate<long long>::Pow(lua_State* L)
+{
+    Eluna::Push(L, static_cast<long long>(powl(static_cast<long double>(Eluna::CHECKVAL<long long>(L, 1)), static_cast<long double>(Eluna::CHECKVAL<long long>(L, 2)))));
+    return 1;
+}
+template<> int ElunaTemplate<long long>::ToString(lua_State* L)
+{
+    long long l = Eluna::CHECKVAL<long long>(L, 1);
+    std::ostringstream ss;
+    ss << l;
+    Eluna::Push(L, ss.str());
+    return 1;
+}
 
 void RegisterFunctions(Eluna* E)
 {
@@ -1343,4 +1411,8 @@ void RegisterFunctions(Eluna* E)
 
     ElunaTemplate<ElunaQuery>::Register(E, "ElunaQuery", true);
     ElunaTemplate<ElunaQuery>::SetMethods(E, QueryMethods);
+
+    ElunaTemplate<long long>::Register(E, "long long", true);
+
+    ElunaTemplate<unsigned long long>::Register(E, "unsigned long long", true);
 }

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010 - 2014 Eluna Lua Engine <http://emudevs.com/>
+* Copyright (C) 2010 - 2015 Eluna Lua Engine <http://emudevs.com/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
 */
@@ -108,20 +108,20 @@ namespace ElunaUtil
         WorldObject const& GetFocusObject() const;
         bool operator()(WorldObject* u);
 
-        bool i_nearest;
         WorldObject const* i_obj;
+        uint32 i_hostile;
+        uint32 i_entry;
         float i_range;
         uint16 i_typeMask;
-        uint32 i_entry;
-        uint32 i_hostile;
+        bool i_nearest;
     };
 
     /*
      * Usage:
      * Inherit this class, then when needing lock, use
-     * ReadGuard lock(_lock);
+     * ReadGuard guard(GetLock());
      * or
-     * WriteGuard lock(_lock);
+     * WriteGuard guard(GetLock());
      *
      * The lock is automatically released at end of scope
      */

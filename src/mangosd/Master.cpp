@@ -43,7 +43,6 @@
 #include "MaNGOSsoap.h"
 #include "MassMailMgr.h"
 #include "DBCStores.h"
-#include "LuaEngine.h"
 
 #include <ace/OS_NS_signal.h>
 #include <ace/TP_Reactor.h>
@@ -319,13 +318,7 @@ int Master::Run()
         // go down and shutdown the server
     }
 
-    ///- Used by Eluna
-    sEluna->OnStartup();
-
     sWorldSocketMgr->Wait();
-
-    ///- Used by Eluna
-    sEluna->OnShutdown();
 
     ///- Stop freeze protection before shutdown tasks
     if (freeze_thread)

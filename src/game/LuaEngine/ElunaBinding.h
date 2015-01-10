@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010 - 2014 Eluna Lua Engine <http://emudevs.com/>
+* Copyright (C) 2010 - 2015 Eluna Lua Engine <http://emudevs.com/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
 */
@@ -17,9 +17,33 @@ extern "C"
 #include "lauxlib.h"
 };
 
-class ElunaBind
+class ElunaBind : public ElunaUtil::RWLockable
 {
 public:
+    struct Binding
+    {
+        int functionReference;
+        bool isTemporary;
+        uint32 remainingShots;
+        Eluna& E;
+
+        Binding(Eluna& _E, int funcRef, uint32 shots) :
+            functionReference(funcRef),
+            isTemporary(shots != 0),
+            remainingShots(shots),
+            E(_E)
+        {
+        }
+
+        // Remove our function from the registry when the Binding is deleted.
+        ~Binding()
+        {
+            luaL_unref(E.L, LUA_REGISTRYINDEX, functionReference);
+        }
+    };
+    typedef std::vector<Binding*> FunctionRefVector;
+    typedef UNORDERED_MAP<int, FunctionRefVector> EventToFunctionsMap;
+
     Eluna& E;
     const char* groupName;
 
@@ -40,9 +64,6 @@ template<typename T>
 class EventBind : public ElunaBind
 {
 public:
-    typedef std::vector<int> ElunaBindingMap;
-    typedef std::map<int, ElunaBindingMap> ElunaEntryMap;
-
     EventBind(const char* bindGroupName, Eluna& _E) : ElunaBind(bindGroupName, _E)
     {
     }
@@ -50,35 +71,65 @@ public:
     // unregisters all registered functions and clears all registered events from the bind std::maps (reset)
     void Clear() override
     {
-        for (ElunaEntryMap::iterator itr = Bindings.begin(); itr != Bindings.end(); ++itr)
+        WriteGuard guard(GetLock());
+
+        for (EventToFunctionsMap::iterator itr = Bindings.begin(); itr != Bindings.end(); ++itr)
         {
-            for (ElunaBindingMap::iterator it = itr->second.begin(); it != itr->second.end(); ++it)
-                luaL_unref(E.L, LUA_REGISTRYINDEX, (*it));
-            itr->second.clear();
+            FunctionRefVector& funcrefvec = itr->second;
+            for (FunctionRefVector::iterator it = funcrefvec.begin(); it != funcrefvec.end(); ++it)
+                delete *it;
+            funcrefvec.clear();
         }
         Bindings.clear();
     }
 
-    void Insert(int eventId, int funcRef) // Inserts a new registered event
+    void Clear(uint32 event_id)
     {
-        Bindings[eventId].push_back(funcRef);
+        WriteGuard guard(GetLock());
+
+        for (FunctionRefVector::iterator itr = Bindings[event_id].begin(); itr != Bindings[event_id].end(); ++itr)
+            delete *itr;
+        Bindings[event_id].clear();
     }
 
-    // Gets the binding std::map containing all registered events with the function refs for the entry
-    ElunaBindingMap* GetBindMap(T eventId)
+    // Pushes the function references and updates the counters on the binds and erases them if the counter would reach 0
+    void PushFuncRefs(lua_State* L, int event_id)
     {
-        if (Bindings.empty())
-            return NULL;
-        ElunaEntryMap::iterator itr = Bindings.find(eventId);
-        if (itr == Bindings.end())
-            return NULL;
+        WriteGuard guard(GetLock());
 
-        return &itr->second;
+        for (FunctionRefVector::iterator it = Bindings[event_id].begin(); it != Bindings[event_id].end();)
+        {
+            FunctionRefVector::iterator it_old = it++;
+            Binding* binding = (*it_old);
+
+            lua_rawgeti(L, LUA_REGISTRYINDEX, binding->functionReference);
+
+            if (binding->isTemporary)
+            {
+                binding->remainingShots--;
+                if (binding->remainingShots == 0)
+                {
+                    delete binding;
+                    Bindings[event_id].erase(it_old);
+                }
+            }
+        }
+
+        if (Bindings[event_id].empty())
+            Bindings.erase(event_id);
+    };
+
+    void Insert(int eventId, int funcRef, uint32 shots) // Inserts a new registered event
+    {
+        WriteGuard guard(GetLock());
+        Bindings[eventId].push_back(new Binding(E, funcRef, shots));
     }
 
     // Checks if there are events for ID
-    bool HasEvents(T eventId) const
+    bool HasEvents(T eventId)
     {
+        ReadGuard guard(GetLock());
+
         if (Bindings.empty())
             return false;
         if (Bindings.find(eventId) == Bindings.end())
@@ -86,15 +137,14 @@ public:
         return true;
     }
 
-    ElunaEntryMap Bindings; // Binding store Bindings[eventId] = {funcRef};
+    EventToFunctionsMap Bindings; // Binding store Bindings[eventId] = {(funcRef, counter)};
 };
 
 template<typename T>
 class EntryBind : public ElunaBind
 {
 public:
-    typedef std::map<int, int> ElunaBindingMap;
-    typedef UNORDERED_MAP<uint32, ElunaBindingMap> ElunaEntryMap;
+    typedef UNORDERED_MAP<uint32, EventToFunctionsMap> EntryToEventsMap;
 
     EntryBind(const char* bindGroupName, Eluna& _E) : ElunaBind(bindGroupName, _E)
     {
@@ -103,61 +153,94 @@ public:
     // unregisters all registered functions and clears all registered events from the bindmap
     void Clear() override
     {
-        for (ElunaEntryMap::iterator itr = Bindings.begin(); itr != Bindings.end(); ++itr)
+        WriteGuard guard(GetLock());
+
+        for (EntryToEventsMap::iterator itr = Bindings.begin(); itr != Bindings.end(); ++itr)
         {
-            for (ElunaBindingMap::const_iterator it = itr->second.begin(); it != itr->second.end(); ++it)
-                luaL_unref(E.L, LUA_REGISTRYINDEX, it->second);
-            itr->second.clear();
+            EventToFunctionsMap& funcmap = itr->second;
+            for (EventToFunctionsMap::iterator it = funcmap.begin(); it != funcmap.end(); ++it)
+            {
+                FunctionRefVector& funcrefvec = it->second;
+                for (FunctionRefVector::iterator i = funcrefvec.begin(); i != funcrefvec.end(); ++i)
+                    delete *i;
+                funcrefvec.clear();
+            }
+            funcmap.clear();
         }
         Bindings.clear();
     }
 
-    void Insert(uint32 entryId, int eventId, int funcRef) // Inserts a new registered event
+    void Clear(uint32 entry, uint32 event_id)
     {
-        if (Bindings[entryId][eventId])
+        WriteGuard guard(GetLock());
+
+        for (FunctionRefVector::iterator itr = Bindings[entry][event_id].begin(); itr != Bindings[entry][event_id].end(); ++itr)
+            delete *itr;
+        Bindings[entry][event_id].clear();
+    }
+
+    // Pushes the function references and updates the counters on the binds and erases them if the counter would reach 0
+    void PushFuncRefs(lua_State* L, int event_id, uint32 entry)
+    {
+        WriteGuard guard(GetLock());
+
+        for (FunctionRefVector::iterator it = Bindings[entry][event_id].begin(); it != Bindings[entry][event_id].end();)
         {
-            luaL_unref(E.L, LUA_REGISTRYINDEX, funcRef); // free the unused ref
-            luaL_error(E.L, "A function is already registered for entry (%d) event (%d)", entryId, eventId);
+            FunctionRefVector::iterator it_old = it++;
+            Binding* binding = (*it_old);
+
+            lua_rawgeti(L, LUA_REGISTRYINDEX, binding->functionReference);
+
+            if (binding->isTemporary)
+            {
+                binding->remainingShots--;
+                if (binding->remainingShots == 0)
+                {
+                    delete binding;
+                    Bindings[entry][event_id].erase(it_old);
+                }
+            }
         }
-        else
-            Bindings[entryId][eventId] = funcRef;
-    }
 
-    // Gets the function ref of an entry for an event
-    int GetBind(uint32 entryId, T eventId) const
+        if (Bindings[entry][event_id].empty())
+            Bindings[entry].erase(event_id);
+
+        if (Bindings[entry].empty())
+            Bindings.erase(entry);
+    };
+
+    void Insert(uint32 entryId, int eventId, int funcRef, uint32 shots) // Inserts a new registered event
     {
-        if (Bindings.empty())
-            return 0;
-        ElunaEntryMap::const_iterator itr = Bindings.find(entryId);
-        if (itr == Bindings.end() || itr->second.empty())
-            return 0;
-        ElunaBindingMap::const_iterator itr2 = itr->second.find(eventId);
-        if (itr2 == itr->second.end())
-            return 0;
-        return itr2->second;
-    }
-
-    // Gets the binding std::map containing all registered events with the function refs for the entry
-    const ElunaBindingMap* GetBindMap(uint32 entryId) const
-    {
-        if (Bindings.empty())
-            return NULL;
-        ElunaEntryMap::const_iterator itr = Bindings.find(entryId);
-        if (itr == Bindings.end())
-            return NULL;
-
-        return &itr->second;
+        WriteGuard guard(GetLock());
+        Bindings[entryId][eventId].push_back(new Binding(E, funcRef, shots));
     }
 
     // Returns true if the entry has registered binds
-    bool HasBinds(uint32 entryId) const
+    bool HasEvents(T eventId, uint32 entryId)
     {
+        ReadGuard guard(GetLock());
+
         if (Bindings.empty())
             return false;
+
+        EntryToEventsMap::const_iterator itr = Bindings.find(entryId);
+        if (itr == Bindings.end())
+            return false;
+
+        return itr->second.find(eventId) != itr->second.end();
+    }
+
+    bool HasEvents(uint32 entryId)
+    {
+        ReadGuard guard(GetLock());
+
+        if (Bindings.empty())
+            return false;
+
         return Bindings.find(entryId) != Bindings.end();
     }
 
-    ElunaEntryMap Bindings; // Binding store Bindings[entryId][eventId] = funcRef;
+    EntryToEventsMap Bindings; // Binding store Bindings[entryId][eventId] = {(funcRef, counter)};
 };
 
 #endif

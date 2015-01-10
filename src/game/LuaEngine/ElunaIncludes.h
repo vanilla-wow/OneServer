@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010 - 2014 Eluna Lua Engine <http://emudevs.com/>
+* Copyright (C) 2010 - 2015 Eluna Lua Engine <http://emudevs.com/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
 */
@@ -44,7 +44,7 @@
 #include "revision.h"
 #else
 #include "Config/Config.h"
-#include "ReactorAI.h"
+#include "AggressorAI.h"
 #include "revision_nr.h"
 #include "BattleGroundMgr.h"
 #endif
@@ -61,6 +61,10 @@
 typedef Opcodes                 OpcodesList;
 #endif
 
+/*
+ * Note: if you add or change a CORE_NAME #define,
+ *   please update LuaGlobalFunctions::GetCoreName docstring.
+ */
 #ifdef MANGOS
 #define CORE_NAME               "MaNGOS"
 #define CORE_VERSION            REVISION_NR
@@ -102,6 +106,7 @@ typedef ThreatContainer::StorageType ThreatList;
 #define DIALOG_STATUS_SCRIPTED_NO_STATUS    DIALOG_STATUS_UNDEFINED
 #define TARGETICONCOUNT         TARGET_ICON_COUNT
 #define MAX_TALENT_SPECS        MAX_TALENT_SPEC_COUNT
+#define TEAM_NEUTRAL            TEAM_INDEX_NEUTRAL
 
 #ifndef CLASSIC
 #define PLAYER_FIELD_LIFETIME_HONORABLE_KILLS   PLAYER_FIELD_LIFETIME_HONORBALE_KILLS

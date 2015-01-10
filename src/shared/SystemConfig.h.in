@@ -41,6 +41,9 @@
 #ifndef _REALMDCONFVERSION
 # define _REALMDCONFVERSION 2010062001
 #endif
+#ifndef _CUSTOMCONFVERSION
+# define _CUSTOMCONFVERSION 2010042201
+#endif
 
 #if MANGOS_ENDIAN == MANGOS_BIGENDIAN
 # define _ENDIAN_STRING "big-endian"
@@ -71,6 +74,7 @@
 # endif
 # define _MANGOSD_CONFIG  SYSCONFDIR"mangosd.conf"
 # define _REALMD_CONFIG   SYSCONFDIR"realmd.conf"
+# define _CUSTOM_CONFIG   SYSCONFDIR"custom.conf"
 # define _AUCTIONHOUSEBOT_CONFIG   SYSCONFDIR"ahbot.conf"
 #else
 # if defined  (__FreeBSD__)
@@ -90,6 +94,7 @@
 # endif
 # define _MANGOSD_CONFIG  SYSCONFDIR"mangosd.conf"
 # define _REALMD_CONFIG  SYSCONFDIR"realmd.conf"
+# define _CUSTOM_CONFIG   SYSCONFDIR"custom.conf"
 # define _AUCTIONHOUSEBOT_CONFIG   SYSCONFDIR"ahbot.conf"
 #endif
 

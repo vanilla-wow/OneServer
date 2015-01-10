@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010 - 2014 Eluna Lua Engine <http://emudevs.com/>
+* Copyright (C) 2010 - 2015 Eluna Lua Engine <http://emudevs.com/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
 */
@@ -26,6 +26,7 @@ LuaEvent::~LuaEvent()
 
 void LuaEvent::Execute()
 {
+    LOCK_ELUNA;
     // In multithread get map from object and the map's lua state
     lua_rawgeti((*events->E)->L, LUA_REGISTRYINDEX, funcRef);
     Eluna::Push((*events->E)->L, funcRef);
@@ -44,18 +45,18 @@ ElunaEventProcessor::ElunaEventProcessor(Eluna** _E, WorldObject* _obj) : m_time
 {
     if (obj)
     {
-        EventMgr::WriteGuard lock((*E)->eventMgr->GetLock());
+        EventMgr::WriteGuard guard((*E)->eventMgr->GetLock());
         (*E)->eventMgr->processors.insert(this);
     }
 }
 
 ElunaEventProcessor::~ElunaEventProcessor()
 {
-    RemoveEvents();
+    RemoveEvents_internal();
 
-    if (obj)
+    if (obj && Eluna::initialized)
     {
-        EventMgr::WriteGuard lock((*E)->eventMgr->GetLock());
+        EventMgr::WriteGuard guard((*E)->eventMgr->GetLock());
         (*E)->eventMgr->processors.erase(this);
     }
 }
@@ -87,6 +88,12 @@ void ElunaEventProcessor::Update(uint32 diff)
 }
 
 void ElunaEventProcessor::RemoveEvents()
+{
+    for (EventList::iterator it = eventList.begin(); it != eventList.end(); ++it)
+        it->second->to_Abort = true;
+}
+
+void ElunaEventProcessor::RemoveEvents_internal()
 {
     //if (!final)
     //{
@@ -125,14 +132,20 @@ EventMgr::EventMgr(Eluna** _E) : globalProcessor(new ElunaEventProcessor(_E, NUL
 
 EventMgr::~EventMgr()
 {
-    RemoveEvents();
+    {
+        ReadGuard guard(GetLock());
+        if (!processors.empty())
+            for (ProcessorSet::const_iterator it = processors.begin(); it != processors.end(); ++it) // loop processors
+                (*it)->RemoveEvents_internal();
+        globalProcessor->RemoveEvents_internal();
+    }
     delete globalProcessor;
     globalProcessor = NULL;
 }
 
 void EventMgr::RemoveEvents()
 {
-    ReadGuard lock(GetLock());
+    ReadGuard guard(GetLock());
     if (!processors.empty())
         for (ProcessorSet::const_iterator it = processors.begin(); it != processors.end(); ++it) // loop processors
             (*it)->RemoveEvents();
@@ -141,7 +154,7 @@ void EventMgr::RemoveEvents()
 
 void EventMgr::RemoveEvent(int eventId)
 {
-    ReadGuard lock(GetLock());
+    ReadGuard guard(GetLock());
     if (!processors.empty())
         for (ProcessorSet::const_iterator it = processors.begin(); it != processors.end(); ++it) // loop processors
             (*it)->RemoveEvent(eventId);

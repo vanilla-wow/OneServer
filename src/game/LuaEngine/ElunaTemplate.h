@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010 - 2014 Eluna Lua Engine <http://emudevs.com/>
+* Copyright (C) 2010 - 2015 Eluna Lua Engine <http://emudevs.com/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
 */
@@ -15,6 +15,7 @@ extern "C"
 };
 #include "LuaEngine.h"
 #include "ElunaUtility.h"
+#include "SharedDefines.h"
 
 class ElunaGlobal
 {
@@ -22,7 +23,7 @@ public:
     struct ElunaRegister
     {
         const char* name;
-        int(*mfunc)(Eluna*);
+        int(*mfunc)(Eluna*, lua_State*);
     };
 
     static int thunk(lua_State* L)
@@ -30,11 +31,12 @@ public:
         ElunaRegister* l = static_cast<ElunaRegister*>(lua_touserdata(L, lua_upvalueindex(1)));
         Eluna* E = static_cast<Eluna*>(lua_touserdata(L, lua_upvalueindex(2)));
         int args = lua_gettop(L);
-        int expected = l->mfunc(E);
+        int expected = l->mfunc(E, L);
         args = lua_gettop(L) - args;
-        if (args < 0 || args > expected) // Assert instead?
+        if (args < 0 || args > expected)
         {
             ELUNA_LOG_ERROR("[Eluna]: %s returned unexpected amount of arguments %i out of %i. Report to devs", l->name, args, expected);
+            ASSERT(false);
         }
         for (; args < expected; ++args)
             lua_pushnil(L);
@@ -43,8 +45,8 @@ public:
 
     static void SetMethods(Eluna* E, ElunaRegister* methodTable)
     {
-        if (!methodTable)
-            return;
+        ASSERT(E);
+        ASSERT(methodTable);
 
         lua_pushglobaltable(E->L);
 
@@ -73,22 +75,32 @@ public:
     {
     }
 
+    // Get wrapped object pointer
     void* GetObj() const { return object; }
+    // Returns whether the object is valid or not
     bool IsValid() const { return _isvalid; }
+    // Returns whether the object can be invalidated or not
     bool CanInvalidate() const { return _invalidate; }
 
+    // Sets the object pointer that is wrapped
     void SetObj(void* obj)
     {
+        ASSERT(obj);
         object = obj;
+        SetValid(true);
     }
+    // Sets the object pointer to valid or invalid
     void SetValid(bool valid)
     {
-        _isvalid = object && valid;
+        ASSERT(!valid || (valid && object));
+        _isvalid = valid;
     }
+    // Sets whether the pointer will be invalidated at end of calls
     void SetValidation(bool invalidate)
     {
         _invalidate = invalidate;
     }
+    // Invalidates the pointer if it should be invalidated
     void Invalidate()
     {
         if (CanInvalidate())
@@ -105,7 +117,7 @@ template<typename T>
 struct ElunaRegister
 {
     const char* name;
-    int(*mfunc)(Eluna*, T*);
+    int(*mfunc)(Eluna*, lua_State*, T*);
 };
 
 template<typename T>
@@ -121,32 +133,42 @@ public:
     // that will only be needed on lua side and will not be managed by TC/mangos/<core>
     static void Register(Eluna* E, const char* name, bool gc = false)
     {
-        ASSERT(!tname || name);
+        ASSERT(E);
+        ASSERT(name);
+
+        // check that metatable isn't already there
+        luaL_getmetatable(E->L, name);
+        ASSERT(lua_isnoneornil(E->L, -1));
+
+        // check that metatable isn't already there
+        lua_getglobal(E->L, name);
+        ASSERT(lua_isnoneornil(E->L, -1));
+
+        // pop metatable and methodtable values
+        lua_pop(E->L, 2);
 
         tname = name;
         manageMemory = gc;
 
+        // create methodtable for userdata of this type
         lua_newtable(E->L);
         int methods = lua_gettop(E->L);
 
-        // store method table in globals so that
-        // scripts can add functions in Lua
+        // push methodtable to stack to be accessed and modified by users
         lua_pushvalue(E->L, methods);
         lua_setglobal(E->L, tname);
 
-        luaL_newmetatable(E->L, tname);
+        // create metatable for userdatas of this type
+        ASSERT(luaL_newmetatable(E->L, tname));
         int metatable = lua_gettop(E->L);
 
         // tostring
-        lua_pushcfunction(E->L, tostringT);
+        lua_pushcfunction(E->L, ToString);
         lua_setfield(E->L, metatable, "__tostring");
 
         // garbage collecting
-        if (manageMemory)
-        {
-            lua_pushcfunction(E->L, gcT);
-            lua_setfield(E->L, metatable, "__gc");
-        }
+        lua_pushcfunction(E->L, CollectGarbage);
+        lua_setfield(E->L, metatable, "__gc");
 
         // make methods accessible through metatable
         lua_pushvalue(E->L, methods);
@@ -156,9 +178,65 @@ public:
         lua_pushvalue(E->L, methods);
         lua_setfield(E->L, metatable, "__newindex");
 
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Add);
+        lua_setfield(E->L, metatable, "__add");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Substract);
+        lua_setfield(E->L, metatable, "__sub");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Multiply);
+        lua_setfield(E->L, metatable, "__mul");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Divide);
+        lua_setfield(E->L, metatable, "__div");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Mod);
+        lua_setfield(E->L, metatable, "__mod");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Pow);
+        lua_setfield(E->L, metatable, "__pow");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, UnaryMinus);
+        lua_setfield(E->L, metatable, "__unm");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Concat);
+        lua_setfield(E->L, metatable, "__concat");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Length);
+        lua_setfield(E->L, metatable, "__len");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Equal);
+        lua_setfield(E->L, metatable, "__eq");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Less);
+        lua_setfield(E->L, metatable, "__lt");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, LessOrEqual);
+        lua_setfield(E->L, metatable, "__le");
+
+        // make new indexes saved to methods
+        lua_pushcfunction(E->L, Call);
+        lua_setfield(E->L, metatable, "__call");
+
         // special method to get the object type
-        lua_pushcfunction(E->L, typeT);
+        lua_pushcfunction(E->L, GetType);
         lua_setfield(E->L, methods, "GetObjectType");
+
+        // special method to decide object invalidation at end of call
+        lua_pushcfunction(E->L, SetInvalidation);
+        lua_setfield(E->L, methods, "SetInvalidation");
 
         // pop methods and metatable
         lua_pop(E->L, 2);
@@ -167,39 +245,32 @@ public:
     template<typename C>
     static void SetMethods(Eluna* E, ElunaRegister<C>* methodTable)
     {
-        if (!methodTable)
-            return;
+        ASSERT(E);
+        ASSERT(tname);
+        ASSERT(methodTable);
 
+        // get metatable
         luaL_getmetatable(E->L, tname);
-        if (!lua_istable(E->L, -1))
-        {
-            lua_remove(E->L, -1);
-            ELUNA_LOG_ERROR("%s missing metatable", tname);
-            return;
-        }
+        ASSERT(lua_istable(E->L, -1));
 
+        // get method table
         lua_getfield(E->L, -1, "__index");
         lua_remove(E->L, -2);
-        if (!lua_istable(E->L, -1))
-        {
-            lua_remove(E->L, -1);
-            ELUNA_LOG_ERROR("%s missing method table from metatable", tname);
-            return;
-        }
+        ASSERT(lua_istable(E->L, -1));
 
         for (; methodTable && methodTable->name && methodTable->mfunc; ++methodTable)
         {
             lua_pushstring(E->L, methodTable->name);
             lua_pushlightuserdata(E->L, (void*)methodTable);
             lua_pushlightuserdata(E->L, (void*)E);
-            lua_pushcclosure(E->L, thunk, 2);
+            lua_pushcclosure(E->L, CallMethod, 2);
             lua_settable(E->L, -3);
         }
 
         lua_remove(E->L, -1);
     }
 
-    static int push(lua_State* L, T const* obj)
+    static int Push(lua_State* L, T const* obj)
     {
         if (!obj)
         {
@@ -213,14 +284,13 @@ public:
             ASSERT(lua_istable(L, -1));
             lua_pushfstring(L, "%p", obj);
             lua_gettable(L, -2);
-            if (!lua_isnoneornil(L, -1) && luaL_checkudata(L, -1, tname))
+            if (ElunaObject* elunaObj = Eluna::CHECKTYPE(L, -1, tname, false))
             {
+                // set userdata valid
+                elunaObj->SetValid(true);
+
                 // remove userdata_table, leave userdata
                 lua_remove(L, -2);
-
-                // set userdata valid
-                if (ElunaObject* elunaObj = Eluna::CHECKOBJ<ElunaObject>(L, -1, false))
-                    elunaObj->SetValid(true);
                 return 1;
             }
             lua_remove(L, -1);
@@ -259,10 +329,9 @@ public:
         return 1;
     }
 
-    static T* check(lua_State* L, int narg, bool error = true)
+    static T* Check(lua_State* L, int narg, bool error = true)
     {
-        ElunaObject* elunaObj = Eluna::CHECKOBJ<ElunaObject>(L, narg, error);
-
+        ElunaObject* elunaObj = Eluna::CHECKTYPE(L, narg, tname, error);
         if (!elunaObj)
             return NULL;
 
@@ -308,27 +377,22 @@ public:
         return static_cast<T*>(elunaObj->GetObj());
     }
 
-    static int typeT(lua_State* L)
+    static int GetType(lua_State* L)
     {
         lua_pushstring(L, tname);
         return 1;
     }
 
-    // Remember special case ElunaTemplate<Vehicle>::gcT
-    static int gcT(lua_State* L)
+    static int SetInvalidation(lua_State* L)
     {
-        // Get object pointer (and check type, no error)
-        ElunaObject** ptrHold = static_cast<ElunaObject**>(luaL_testudata(L, -1, tname));
-        if (ptrHold)
-        {
-            if (manageMemory)
-                delete static_cast<T*>((*ptrHold)->GetObj());
-            delete *ptrHold;
-        }
+        ElunaObject* elunaObj = Eluna::CHECKOBJ<ElunaObject>(L, 1);
+        bool invalidate = Eluna::CHECKVAL<bool>(L, 2);
+
+        elunaObj->SetValidation(invalidate);
         return 0;
     }
 
-    static int thunk(lua_State* L)
+    static int CallMethod(lua_State* L)
     {
         T* obj = Eluna::CHECKOBJ<T>(L, 1); // get self
         if (!obj)
@@ -336,11 +400,12 @@ public:
         ElunaRegister<T>* l = static_cast<ElunaRegister<T>*>(lua_touserdata(L, lua_upvalueindex(1)));
         Eluna* E = static_cast<Eluna*>(lua_touserdata(L, lua_upvalueindex(2)));
         int top = lua_gettop(L);
-        int expected = l->mfunc(E, obj);
+        int expected = l->mfunc(E, L, obj);
         int args = lua_gettop(L) - top;
-        if (args < 0 || args > expected) // Assert instead?
+        if (args < 0 || args > expected)
         {
             ELUNA_LOG_ERROR("[Eluna]: %s returned unexpected amount of arguments %i out of %i. Report to devs", l->name, args, expected);
+            ASSERT(false);
         }
         if (args == expected)
             return expected;
@@ -348,15 +413,41 @@ public:
         return 0;
     }
 
-    static int tostringT(lua_State* L)
+    // Metamethods ("virtual")
+
+    // Remember special cases like ElunaTemplate<Vehicle>::CollectGarbage
+    static int CollectGarbage(lua_State* L)
     {
-        T* obj = Eluna::CHECKOBJ<T>(L, 1); // get self
-        if (obj)
-            lua_pushfstring(L, "%s: (%p)", tname, obj);
-        else
-            lua_pushstring(L, "nil");
+        // Get object pointer (and check type, no error)
+        ElunaObject* obj = Eluna::CHECKOBJ<ElunaObject>(L, 1, false);
+        if (obj && manageMemory)
+            delete static_cast<T*>(obj->GetObj());
+        delete obj;
+        return 0;
+    }
+
+    static int ToString(lua_State* L)
+    {
+        T* obj = Eluna::CHECKOBJ<T>(L, 1, true); // get self
+        lua_pushfstring(L, "%s: (%p)", tname, obj);
         return 1;
     }
+
+    static int ArithmeticError(lua_State* L) { return luaL_error(L, "attempt to perform arithmetic on a %s value", tname); }
+    static int CompareError(lua_State* L) { return luaL_error(L, "attempt to compare %s", tname); }
+    static int Add(lua_State* L) { return ArithmeticError(L); }
+    static int Substract(lua_State* L) { return ArithmeticError(L); }
+    static int Multiply(lua_State* L) { return ArithmeticError(L); }
+    static int Divide(lua_State* L) { return ArithmeticError(L); }
+    static int Mod(lua_State* L) { return ArithmeticError(L); }
+    static int Pow(lua_State* L) { return ArithmeticError(L); }
+    static int UnaryMinus(lua_State* L) { return ArithmeticError(L); }
+    static int Concat(lua_State* L) { return luaL_error(L, "attempt to concatenate a %s value", tname); }
+    static int Length(lua_State* L) { return luaL_error(L, "attempt to get length of a %s value", tname); }
+    static int Equal(lua_State* L) { Eluna::Push(L, Eluna::CHECKOBJ<T>(L, 1) == Eluna::CHECKOBJ<T>(L, 2)); return 1; }
+    static int Less(lua_State* L) { return CompareError(L); }
+    static int LessOrEqual(lua_State* L) { return CompareError(L); }
+    static int Call(lua_State* L) { return luaL_error(L, "attempt to call a %s value", tname); }
 };
 
 #endif

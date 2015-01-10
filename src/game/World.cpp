@@ -68,6 +68,7 @@
 #include "CreatureLinkingMgr.h"
 #include "WardenDataStorage.h"
 #include "LuaEngine.h"
+#include "Custom/Custom.h"
 
 INSTANTIATE_SINGLETON_1(World);
 
@@ -923,6 +924,7 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize config settings
     LoadConfigSettings();
+    sCustom.CustomInit();
 
     ///- Check the existence of the map files for all races start areas.
     if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f) ||                     // Dwarf/ Gnome
@@ -1411,6 +1413,7 @@ void World::SetInitialWorldSettings()
     // in multithread foreach: run scripts
     sEluna->RunScripts();
     sEluna->OnConfigLoad(false); // Must be done after Eluna is initialized and scripts have run
+    sLog.outString();
 
     sLog.outString("---------------------------------------");
     sLog.outString("      CMANGOS: World initialized       ");
